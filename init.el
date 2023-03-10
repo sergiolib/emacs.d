@@ -1,3 +1,6 @@
+;;; package --- Init.el
+;;; Commentary: This is my Emacs configuration. It works with the current bleeding edge Emacs version.
+;;; Code:
 (defvar native-comp-deferred-compilation-deny-list nil)
 (defvar bootstrap-version)
 (let ((bootstrap-file
@@ -171,7 +174,6 @@
     (define-key map (kbd "C-.") 'embark-act)
     (define-key map (kbd "M-.") 'embark-dwim)
     (define-key map (kbd "C-h B") 'embark-bindings))
-  (add-hook 'eldoc-documentation-functions #'embark-eldoc-first-target)
   :custom
   (embark-prompter 'embark-keymap-prompter)
   (embark-quit-after-action '((t . nil)))
@@ -235,6 +237,7 @@
   (add-hook mode #'(lambda () (display-line-numbers-mode 0))))
 
 (defun set-window-faces (frame)
+  "Set font families and sizes for all frames. FRAME is the frame where the setting gets done."
   (set-face-attribute 'default nil :family "JetBrains Mono" :height 110 :weight 'semi-light)
   (set-face-attribute 'fixed-pitch nil :family "JetBrains Mono" :height 110)
   (set-face-attribute 'variable-pitch nil :family "Noto Serif" :height 120)
@@ -546,3 +549,5 @@
 					  (indent-region (point-min) (point-max)))))))
 
 (add-hook 'emacs-lisp-mode-hook 'flymake-mode)
+
+(add-to-ordered-list 'eldoc-documentation-functions 'flymake-eldoc-function 1)
