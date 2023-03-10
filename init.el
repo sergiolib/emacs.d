@@ -544,3 +544,5 @@
 			      (when (or (eq major-mode 'emacs-lisp-mode) (eq major-mode 'lisp-data-mode)
 					(save-excursion
 					  (indent-region (point-min) (point-max)))))))
+
+(add-hook 'emacs-lisp-mode-hook 'flymake-mode)
