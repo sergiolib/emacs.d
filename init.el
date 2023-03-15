@@ -237,9 +237,10 @@
   (add-hook mode #'(lambda () (display-line-numbers-mode 0))))
 
 (defun set-window-faces (frame)
-  "Set font families and sizes for all frames. FRAME is the frame where the setting gets done."
-  (set-face-attribute 'default nil :family "JetBrains Mono" :height 110 :weight 'semi-light)
-  (set-face-attribute 'fixed-pitch nil :family "JetBrains Mono" :height 110)
+  "Set font families and sizes for all frames.
+FRAME is the frame where the setting gets done."
+  (set-face-attribute 'default nil :family "Noto Sans Mono" :height 120)
+  (set-face-attribute 'fixed-pitch nil :family "Noto Sans Mono" :height 120)
   (set-face-attribute 'variable-pitch nil :family "Noto Serif" :height 120)
   (remove-hook 'after-make-frame-functions 'set-window-faces))
 (if (and (boundp 'server-process)
@@ -458,6 +459,8 @@
 
   (advice-add 'org-babel-do-key-sequence-in-edit-buffer
               :around #'evil-org-insert-state-in-edit-buffer)
+
+  (require 'ox-md)
 
   (require 'org-tempo)
 
