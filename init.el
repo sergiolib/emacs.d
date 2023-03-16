@@ -108,7 +108,8 @@
   :config
   (setq completion-styles '(orderless basic)
 	completion-category-defaults nil
-	completion-category-overrides '((file (styles partial-completion))))
+	completion-category-overrides '((file (styles partial-completion)))
+	completion-ignore-case t)
   (defun orderless-fast-dispatch (word index total)
     (and (= index 0) (= total 1) (length< word 4)
 	 `(orderless-regexp . ,(concat "^" (regexp-quote word)))))
@@ -239,9 +240,9 @@
 (defun set-window-faces (frame)
   "Set font families and sizes for all frames.
 FRAME is the frame where the setting gets done."
-  (set-face-attribute 'default nil :family "Noto Sans Mono" :height 120)
-  (set-face-attribute 'fixed-pitch nil :family "Noto Sans Mono" :height 120)
-  (set-face-attribute 'variable-pitch nil :family "Noto Serif" :height 120)
+  (set-face-attribute 'default nil :family "JetBrains Mono" :height 120)
+  (set-face-attribute 'fixed-pitch nil :family "JetBrains Mono" :height 120)
+  (set-face-attribute 'variable-pitch nil :family "Cantarell" :height 140)
   (remove-hook 'after-make-frame-functions 'set-window-faces))
 (if (and (boundp 'server-process)
 	 (processp server-process)
@@ -545,12 +546,18 @@ FRAME is the frame where the setting gets done."
 (load-file "~/.emacs.d/fix_keywords_align.el")
 
 ;; Indent the buffer in emacs-lisp mode and lisp-data mode
-(add-hook 'before-save-hook (lambda ()
-			      (interactive)
-			      (when (or (eq major-mode 'emacs-lisp-mode) (eq major-mode 'lisp-data-mode)
-					(save-excursion
-					  (indent-region (point-min) (point-max)))))))
+(defun sergio/add-indent-to-hook ()
+  "Add indent to before save hook."
+  (add-hook 'before-save-hook (lambda ()
+				(interactive)
+				(save-excursion
+				  (indent-region (point-min) (point-max)))) nil t))
 
 (add-hook 'emacs-lisp-mode-hook 'flymake-mode)
+(add-hook 'emacs-lisp-mode-hook 'sergio/add-indent-to-hook)
+(add-hook 'lisp-data-mode-hook 'sergio/add-indent-to-hook)
 
 (add-to-ordered-list 'eldoc-documentation-functions 'flymake-eldoc-function 1)
+
+(add-hook 'python-mode-hook 'electric-pair-local-mode)
+
