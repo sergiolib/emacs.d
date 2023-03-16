@@ -67,15 +67,19 @@
     :prefix "SPC"
     :global-prefix "C-SPC"))
 
-(use-package modus-themes
-  :ensure t
+;; (use-package modus-themes
+;;   :ensure t
+;;   :config
+;;   (load-theme 'modus-vivendi t)
+;;   :custom
+;;   (modus-themes-common-palette-overrides '((border-mode-line-active unspecified)
+;; 					   (border-mode-line-inactive unspecified)
+;; 					   (bg-mode-line-active bg-blue-intense)
+;; 					   (fg-mode-line-active fg-main))))
+
+(use-package doom-themes
   :config
-  (load-theme 'modus-vivendi t)
-  :custom
-  (modus-themes-common-palette-overrides '((border-mode-line-active unspecified)
-					   (border-mode-line-inactive unspecified)
-					   (bg-mode-line-active bg-blue-intense)
-					   (fg-mode-line-active fg-main))))
+  (load-theme 'doom-monokai-spectrum t))
 
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
@@ -158,10 +162,10 @@
 (setq tab-always-indent 'complete)
 
 (use-package python
-  :mode ("\\.python\\'" . python-mode)
+  :mode ("\\.py\\'" . python-ts-mode)
   :init
-  (add-hook 'python-mode-hook 'pyvenv-mode)
-  (add-hook 'python-mode-hook 'pyvenv-tracking-mode))
+  (add-hook 'python-ts-mode-hook 'pyvenv-mode)
+  (add-hook 'python-ts-mode-hook 'pyvenv-tracking-mode))
 
 (use-package embark
   :commands (embark-act embark-dwim embark-bindings)
@@ -194,10 +198,15 @@
   :init
   (defalias 'cape-eglot-dabbrev
     (cape-super-capf (cape-capf-buster #'eglot-completion-at-point) #'cape-dabbrev))
-  (add-hook 'eglot-completion-mode-hook #'(lambda () (setq-local completion-at-point-functions '(cape-eglot-dabbrev cape-file))))
+  (add-hook 'eglot-completion-mode-hook #'(lambda ()
+					    (setq-local completion-at-point-functions '(cape-eglot-dabbrev cape-file))))
   (defalias 'cape-elisp+dabbrev
     (cape-super-capf #'elisp-completion-at-point #'cape-dabbrev))
-  (add-hook 'emacs-lisp-mode-hook #'(lambda () (setq-local completion-at-point-functions '(cape-elisp+dabbrev cape-file)))))
+  (defun sergio/add-completions-lisp-to-hook ()
+    "Adds completions with elisp, dabbrev and cape-file."
+    (setq-local completion-at-point-functions '(cape-elisp+dabbrev cape-file)))
+  (add-hook 'lisp-data-mode-hook #'sergio/add-completions-lisp-to-hook)
+  (add-hook 'emacs-lisp-mode-hook #'sergio/add-completions-lisp-to-hook))
 
 (use-package which-key
   :init
@@ -240,10 +249,19 @@
 (defun set-window-faces (frame)
   "Set font families and sizes for all frames.
 FRAME is the frame where the setting gets done."
-  (set-face-attribute 'default nil :family "JetBrains Mono" :height 120)
-  (set-face-attribute 'fixed-pitch nil :family "JetBrains Mono" :height 120)
-  (set-face-attribute 'variable-pitch nil :family "Cantarell" :height 140)
+  (set-face-attribute 'default nil :family "JetBrains Mono" :height 130 :weight 'semi-light)
+  (set-face-attribute 'fixed-pitch nil :family "JetBrains Mono" :height 130 :weight 'semi-light)
+  (set-face-attribute 'variable-pitch nil :family "Cantarell" :height 150)
   (remove-hook 'after-make-frame-functions 'set-window-faces))
+
+;; Here I wanted to make the manuals' mode in Emacs have variable
+;; fonts by default, but it looks horrible so I removed it
+;; (add-hook 'Info-mode-hook (lambda ()
+;; 			    (display-line-numbers-mode -1)
+;; 			    (face-remap-add-relative 'default 'variable-pitch)))
+(add-hook 'Info-mode-hook (lambda ()
+			    (display-line-numbers-mode -1)))
+
 (if (and (boundp 'server-process)
 	 (processp server-process)
 	 (server-running-p))
@@ -534,12 +552,44 @@ FRAME is the frame where the setting gets done."
   :config
   (add-hook 'before-save-hook (lambda () (interactive) (when (eglot-managed-p) (eglot-format-buffer))))
   (set-face-attribute 'eglot-highlight-symbol-face nil :inherit 'bold :underline t)
+  (add-to-list 'eglot-server-programs
+	       `(python-ts-mode . ,(eglot-alternatives
+				    `("pylsp" "pyls" ("pyright-langserver" "--stdio") "jedi-language-server"))))
+  (setq-default eglot-workspace-configuration '(:pylsp
+						(:plugins
+						 (:black
+						  (:enabled t)
+						  :yapf
+						  (:enabled :json-false)
+						  :isort
+						  (:enabled t)
+						  :jedi
+						  (:extra_paths
+						   ["/home/sliberman/Documents/src/Substorm.Module"])
+						  :mypy
+						  (:enabled :json-false)
+						  :autopep8
+						  (:enabled :json-false)
+						  :pycodestyle
+						  (:enabled :json-false)
+						  :mccabe
+						  (:enabled :json-false)
+						  :pyflakes
+						  (:enabled nil)
+						  :flake8
+						  (:enabled t)
+						  :pydocstyle
+						  (:enabled t
+						   :convention "google"))
+						 :configurationSources
+						 ["flake8"])))
   :hook
-  (python-mode . eglot-ensure)
+  (python-ts-mode . eglot-ensure)
   :general (leader
 	     "l" '(:ignore t :which-key "LSP")
 	     "lr" 'eglot-rename
 	     "l=" 'eglot-format-buffer
+	     "la" 'eglot-code-actions
 	     "lg" '(:ignore t :which-key "Go to")
 	     "le" 'flymake-show-buffer-diagnostics))
 
@@ -559,5 +609,18 @@ FRAME is the frame where the setting gets done."
 
 (add-to-ordered-list 'eldoc-documentation-functions 'flymake-eldoc-function 1)
 
-(add-hook 'python-mode-hook 'electric-pair-local-mode)
+(add-hook 'python-ts-mode-hook 'electric-pair-local-mode)
 
+(use-package markdown-mode)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(safe-local-variable-values '((pyvenv-activate . "/home/sliberman/envs/nobias"))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
