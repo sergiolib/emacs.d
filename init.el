@@ -30,6 +30,11 @@
 (setq calendar-week-start-day 1)
 (setq native-comp-async-report-warnings-errors nil)
 
+(use-package undo-tree
+  :config
+  (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo-tree-history/")))
+  (global-undo-tree-mode 1))
+
 (use-package evil
   :init
   (setq evil-want-keybinding nil)
@@ -40,7 +45,7 @@
   (evil-local-set-key 'normal (kbd "g r") 'revert-buffer)
   (global-set-key (kbd "C-M-u") 'universal-argument)
   :custom
-  (evil-undo-system 'undo-redo)
+  (evil-undo-system 'undo-tree)
   (evil-want-integration t)
   (evil-want-C-u-scroll t)
   (evil-want-C-d-scroll t)
