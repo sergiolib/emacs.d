@@ -174,6 +174,8 @@
 (use-package embark
   :commands (embark-act embark-dwim embark-bindings)
   :init
+  (setq enable-recursive-minibuffers t)
+  (minibuffer-depth-indicate-mode 1)
   (dolist (map (list corfu-map
 		     minibuffer-mode-map
 		     evil-insert-state-map
