@@ -202,7 +202,7 @@
 
 (use-package cape
   :init
-  (defalias 'cape-eglot-dabbrev
+  (defalias 'cape-eglot+dabbrev
     (cape-super-capf (cape-capf-buster #'eglot-completion-at-point) #'cape-dabbrev))
   (add-hook 'eglot-completion-mode-hook #'(lambda ()
 					    (setq-local completion-at-point-functions '(cape-eglot-dabbrev cape-file))))
@@ -211,8 +211,12 @@
   (defun sergio/add-completions-lisp-to-hook ()
     "Adds completions with elisp, dabbrev and cape-file."
     (setq-local completion-at-point-functions '(cape-elisp+dabbrev cape-file)))
+  (defun sergio/add-completions-eglot-to-hook ()
+    "Adds completions with eglot, dabbrev and cape-file."
+    (setq-local completion-at-point-functions '(cape-eglot+dabbrev cape-file)))
   (add-hook 'lisp-data-mode-hook #'sergio/add-completions-lisp-to-hook)
-  (add-hook 'emacs-lisp-mode-hook #'sergio/add-completions-lisp-to-hook))
+  (add-hook 'emacs-lisp-mode-hook #'sergio/add-completions-lisp-to-hook)
+  (add-hook 'eglot-managed-mode-hook #'sergio/add-completions-eglot-to-hook))
 
 (use-package which-key
   :init
