@@ -573,26 +573,21 @@ FRAME is the frame where the setting gets done."
 						  (:enabled :json-false)
 						  :isort
 						  (:enabled t)
-						  :jedi
-						  (:extra_paths
-						   ["/home/sliberman/Documents/src/Substorm.Module"])
-						  :mypy
-						  (:enabled :json-false)
 						  :autopep8
-						  (:enabled :json-false)
-						  :pycodestyle
-						  (:enabled :json-false)
-						  :mccabe
-						  (:enabled :json-false)
-						  :pyflakes
-						  (:enabled nil)
-						  :flake8
 						  (:enabled t)
+						  :pycodestyle
+						  (:enabled t)
+						  :mccabe
+						  (:enabled t)
+						  :pyflakes
+						  (:enabled t)
+						  :flake8
+						  (:enabled :json-false)
 						  :pydocstyle
 						  (:enabled t
 						   :convention "google"))
 						 :configurationSources
-						 ["flake8"])))
+						 ["pycodestyle"])))
   :hook
   (python-ts-mode . eglot-ensure)
   :general (leader
