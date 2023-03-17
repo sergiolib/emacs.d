@@ -72,19 +72,18 @@
     :prefix "SPC"
     :global-prefix "C-SPC"))
 
-;; (use-package modus-themes
-;;   :ensure t
-;;   :config
-;;   (load-theme 'modus-vivendi t)
-;;   :custom
-;;   (modus-themes-common-palette-overrides '((border-mode-line-active unspecified)
-;; 					   (border-mode-line-inactive unspecified)
-;; 					   (bg-mode-line-active bg-blue-intense)
-;; 					   (fg-mode-line-active fg-main))))
-
-(use-package doom-themes
+(use-package modus-themes
   :config
-  (load-theme 'doom-monokai-spectrum t))
+  (load-theme 'modus-vivendi t)
+  :custom
+  (modus-themes-common-palette-overrides '((border-mode-line-active unspecified)
+					   (border-mode-line-inactive unspecified)
+					   (bg-mode-line-active bg-blue-intense)
+					   (fg-mode-line-active fg-main))))
+
+;; (use-package doom-themes
+;;   :config
+;;   (load-theme 'doom-monokai-spectrum t))
 
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
