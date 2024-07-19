@@ -9,3 +9,16 @@
 
 # Undo-tree save-files
 *.~undo-tree
+
+# Emacs specific files
+.cache/
+.lsp-session-v1
+elpa/
+elpaca/
+history
+org-persist/
+places
+projects
+recentf
+transient/
+var/
