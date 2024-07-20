@@ -227,6 +227,31 @@
   :config
   (global-git-gutter-mode 1))
 
+(use-package yasnippet
+  :config
+  (yas-global-mode 1))
+
+(use-package json-mode
+  :mode
+  ("\\.json\\'" . json-mode))
+
+(use-package denote
+  :bind
+  ("C-c C-n" . denote-open-or-create)
+  :custom
+  (denote-directory "~/Documents/Notes/"))
+
+(use-package org
+  :ensure nil
+  :bind
+  ("C-c a" . org-agenda-list)
+  ("C-c c" . org-capture)
+  :custom
+  (org-indent-indentation-per-level 1)
+  (org-agenda-files (append (f-files "~/Documents/Notes" #'(lambda (f) (s-ends-with? ".org" f)) t) '("~/Documents/Agenda.org")))
+  :hook
+  (org-mode . org-indent-mode))
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
