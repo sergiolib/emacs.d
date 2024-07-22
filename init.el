@@ -246,9 +246,11 @@
   :bind
   ("C-c a" . org-agenda-list)
   ("C-c c" . org-capture)
+  ("C-c s" . org-store-link)
   :custom
   (org-indent-indentation-per-level 1)
-  (org-agenda-files (append (f-files "~/Documents/Notes" #'(lambda (f) (s-ends-with? ".org" f)) t) '("~/Documents/Agenda.org")))
+  (org-agenda-files (append (f-files "~/Documents/Notes" #'(lambda (f) (s-ends-with? ".org" f)) t) '("~/Insync/sergiolib@gmail.com/Google Drive/Agenda.org")))
+  (org-default-notes-file "~/Insync/sergiolib@gmail.com/Google Drive/CapturedTasks.org")
   :hook
   (org-mode . org-indent-mode))
 
