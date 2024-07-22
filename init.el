@@ -125,6 +125,15 @@
   :config
   (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
 
+(use-package dired
+  :ensure nil
+  :config
+  (add-hook 'dired-mode-hook dired-hide-details-mode))
+
+(use-package nerd-icons-dired
+  :hook
+  (dired-mode . nerd-icons-dired-mode))
+
 (use-package vterm)
 
 (use-package treemacs
