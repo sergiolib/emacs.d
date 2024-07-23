@@ -54,6 +54,9 @@
 (use-package emacs
   :ensure nil
   :config
+  ;;disable splash screen and startup message
+  (setq inhibit-startup-message t)
+  (setq initial-scratch-message nil)
   (setq ring-bell-function #'ignore)
   (tool-bar-mode -1)
   (menu-bar-mode 1)
@@ -135,7 +138,9 @@
   :hook
   (dired-mode . nerd-icons-dired-mode))
 
-(use-package vterm)
+(use-package vterm
+  :bind
+  ("<f8>" . vterm))
 
 (use-package treemacs
   :config
