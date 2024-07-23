@@ -112,8 +112,9 @@
 (use-package corfu
   :init
   (global-corfu-mode 1)
-  :bind (:map corfu-map
-	      ("RET" . nil)))
+  :custom
+  (corfu-auto t)
+  (corfu-auto-prefix 3))
 
 (use-package doom-modeline
   :config
@@ -128,7 +129,7 @@
 (use-package dired
   :ensure nil
   :config
-  (add-hook 'dired-mode-hook dired-hide-details-mode))
+  (add-hook 'dired-mode-hook 'dired-hide-details-mode))
 
 (use-package nerd-icons-dired
   :hook
@@ -180,7 +181,9 @@
   (pyvenv-mode 1)
   (pyvenv-tracking-mode 1))
 
-(use-package terraform-mode)
+(use-package terraform-mode
+  :hook
+  (terraform-mode . eglot-ensure))
 
 (use-package cape
   :config
@@ -247,8 +250,9 @@
 (use-package denote
   :bind
   ("C-c C-n" . denote-open-or-create)
+  ("C-c n" . denote-open-or-create)
   :custom
-  (denote-directory "~/Documents/Notes/"))
+  (denote-directory (if (eq system-type 'darwin) "~/Library/CloudStorage/GoogleDrive-sergiolib@gmail.com/My Drive/Notes/" "~/Documents/Notes/")))
 
 (use-package org
   :ensure nil
@@ -259,7 +263,20 @@
   (org-indent-indentation-per-level 1)
   (org-agenda-files (append (f-files "~/Documents/Notes" #'(lambda (f) (s-ends-with? ".org" f)) t) '("~/Documents/Agenda.org")))
   :hook
-  (org-mode . org-indent-mode))
+  (org-mode . org-indent-mode)
+  :config
+  (require 'org-tempo)
+  (add-to-list 'org-structure-template-alist '("sql" . "src sql"))
+  (add-hook
+ 'org-mode-hook
+ (lambda ()
+   (setq-local electric-pair-inhibit-predicate
+               `(lambda (c)
+                  (if (char-equal c ?<) t (,electric-pair-inhibit-predicate c))))))
+  (require 'ob-sql)
+  (org-babel-do-load-languages
+   'org-babel-load-languages '((emacs-lisp . t)
+			       (sql . t))))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
