@@ -290,7 +290,8 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages '(eglot))
  '(safe-local-variable-values
-   '((c-default-style . "k&r")
+   '((eval setenv "PYTHONPATH" "/Users/sliberman/Documents/src/Substorm.Anonymizer/api/.venv/lib/python3.12/site-packages/")
+     (c-default-style . "k&r")
      (eval setenv "PYTHONPATH" "~/Library/Caches/pypoetry/virtualenvs/anonymizer-A6bZtkw6-py3.12/lib/python3.12/site-packages/")
      (eval setenv "PYTHONPATH" "~/Library/Caches/pypoetry/virtualenvs/")
      (eval setenv "PYTHONPATH" "~/Library/Caches/pypoetry/virtualenvs/non-package-mode-L3eHqBKk-py3.12/lib/python3.12/site-packages/"))))
