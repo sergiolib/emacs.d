@@ -61,8 +61,8 @@
   (tool-bar-mode -1)
   (menu-bar-mode 1)
   (scroll-bar-mode -1)
-  (setq modus-themes-mode-line '(accented borderless 1.0))
-  (load-theme 'modus-operandi)
+  ;; (setq modus-themes-mode-line '(accented borderless 1.0))
+  ;; (load-theme 'modus-operandi)
   (set-face-attribute 'default nil :height 140 :family "JetBrains Mono")
   (auto-save-visited-mode 1)
   (setq calendar-week-start-day 1)
@@ -81,7 +81,34 @@
   (windmove-default-keybindings '(C S))
   (winner-mode 1)
   (add-hook 'compilation-filter-hook 'ansi-color-compilation-filter)
-  (add-hook 'compilation-filter-hook 'ansi-osc-compilation-filter))
+  (add-hook 'compilation-filter-hook 'ansi-osc-compilation-filter)
+  (add-hook 'tsx-ts-mode-hook 'eglot-ensure)
+  (add-hook 'typescript-ts-mode-hook 'eglot-ensure)
+  (add-hook 'typescript-ts-mode-hook #'(lambda () (setq-local js-indent-level 2)))
+  (add-hook 'tsx-ts-mode-hook #'(lambda () (setq-local js-indent-level 2)))
+  (add-hook 'typescript-ts-mode-hook #'(lambda () (setq-local js-jsx-indent-level 2)))
+  (add-hook 'tsx-ts-mode-hook #'(lambda () (setq-local js-jsx-indent-level 2)))
+  :mode
+  ("\\.tsx\\'" . tsx-ts-mode)
+  ("\\.ts\\'" . typescript-ts-mode))
+
+(use-package apheleia
+  :config
+  (setf (alist-get 'prettier-json apheleia-formatters)
+        '("prettier"
+	  "--trailing-comma" "es5"
+	  "--bracket-spacing" "true"
+          "--single-quote" "true"
+          "--semi" "false"
+          "--print-width" "100"
+	  "--tab-width" "4"
+	  "--stdin-filepath" filepath))
+  (add-hook 'tsx-ts-mode-hook 'apheleia-mode)
+  (add-hook 'typescript-ts-mode-hook 'apheleia-mode))
+
+(use-package ef-themes
+  :config
+  (load-theme 'ef-maris-light t))
 
 (use-package vertico
   :config
@@ -149,37 +176,34 @@
 (use-package eglot
   :ensure nil
   :config
-  (setq eglot-events-buffer-size 0)
+  (setq eglot-events-buffer-size 2000000)
   (setq-default eglot-workspace-configuration
-                  '(:pylsp (:plugins (
-                                      :flake8 (:enabled :json-false)
-                                      :pycodestyle (:enabled :json-false)
-                                      :pyflakes (:enabled :json-false)
-                                      :mccabe (:enabled :json-false)
-                                      :mypy (:enabled :json-false)
-                                      :ruff (:enabled t
-					     :formatEnabled t
-					     :format ["I"]
-                                             :lineLength 160
-                                             :targetVersion "py311")
-                                      :isort (:enabled t)
-                                      )
-                                     :configurationSources ["flake8"])
-                           :terraform-ls (:prefillRequiredFields t)
-                           :typescript-language-server (:typescript (:format (:indentSize 2)))))
+                '(:pylsp (:plugins (
+                                    :flake8 (:enabled :json-false)
+                                    :pycodestyle (:enabled :json-false)
+                                    :pyflakes (:enabled :json-false)
+                                    :mccabe (:enabled :json-false)
+                                    :mypy (:enabled :json-false)
+                                    :ruff (:enabled t
+						    :formatEnabled t
+						    :format ["I"]
+						    :lineLength 160
+						    :targetVersion "py311")
+                                    :isort (:enabled t)
+				    ;;:rope_autoimport (:enabled t) ;; (Slow AF)
+                                    )
+                                   :configurationSources ["flake8"])
+                         :terraform-ls (:prefillRequiredFields t)
+                         :typescript-language-server (:typescript (:format (:indentSize 2)))))
   (set-face-attribute 'eglot-diagnostic-tag-unnecessary-face nil :underline t :slant 'italic)
-  :bind (:map eglot-mode-map
-	      ("C-c l r" . eglot-rename)
-	      ("C-c l a" . eglot-code-actions)))
+  (define-key eglot-mode-map (kbd "C-c l r") 'eglot-rename)
+  (define-key eglot-mode-map (kbd "C-c l a") 'eglot-code-actions)
+  (define-key eglot-mode-map (kbd "C-c l =") 'eglot-format-buffer))
 
 (use-package python
   :ensure nil
   :config
-  (add-hook 'python-mode-hook 'eglot-ensure)
-  (defun add-eglot-format-before-save ()
-    "Add format on before save hook from eglot"
-    (add-hook 'before-save-hook #'(lambda () (when eglot--managed-mode (eglot-format-buffer))) nil t))
-  (add-hook 'python-mode-hook 'add-eglot-format-before-save))
+  (add-hook 'python-mode-hook 'eglot-ensure))
 
 (use-package pyvenv
   :config
@@ -273,21 +297,48 @@
   (require 'org-tempo)
   (add-to-list 'org-structure-template-alist '("sql" . "src sql"))
   (add-hook
- 'org-mode-hook
- (lambda ()
-   (setq-local electric-pair-inhibit-predicate
-               `(lambda (c)
-                  (if (char-equal c ?<) t (,electric-pair-inhibit-predicate c))))))
+   'org-mode-hook
+   (lambda ()
+     (setq-local electric-pair-inhibit-predicate
+		 `(lambda (c)
+                    (if (char-equal c ?<) t (,electric-pair-inhibit-predicate c))))))
   (require 'ob-sql)
   (org-babel-do-load-languages
    'org-babel-load-languages '((emacs-lisp . t)
 			       (sql . t))))
+(use-package avy
+  :bind ("C-c C-z" . avy-goto-char))
+
+(use-package combobulate
+  :ensure (:type git :host github :repo "mickeynp/combobulate")
+  :init
+  ;; You can customize Combobulate's key prefix here.
+  ;; Note that you may have to restart Emacs for this to take effect!
+  (setq combobulate-key-prefix "C-c o")
+  
+  ;; Optional, but recommended.
+  ;;
+  ;; You can manually enable Combobulate with `M-x
+  ;; combobulate-mode'.
+  :hook
+  ((python-ts-mode . combobulate-mode)
+   (js-ts-mode . combobulate-mode)
+   (go-mode . go-ts-mode)
+   (html-ts-mode . combobulate-mode)
+   (css-ts-mode . combobulate-mode)
+   (yaml-ts-mode . combobulate-mode)
+   (typescript-ts-mode . combobulate-mode)
+   (json-ts-mode . combobulate-mode)
+   (tsx-ts-mode . combobulate-mode))
+  )
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   '("6ccb6eb66c70661934a94f395d755a84f3306732271c55d41a501757e4c39fcb" default))
  '(package-selected-packages '(eglot))
  '(safe-local-variable-values
    '((eval setenv "PYTHONPATH" "/Users/sliberman/Documents/src/Substorm.Anonymizer/api/.venv/lib/python3.12/site-packages/")
