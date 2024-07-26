@@ -54,12 +54,16 @@
 (use-package emacs
   :ensure nil
   :config
+  (setq tab-width 4)
+  ;;disable splash screen and startup message
+  (setq inhibit-startup-message t)
+  (setq initial-scratch-message nil)
   (setq ring-bell-function #'ignore)
   (tool-bar-mode -1)
   (menu-bar-mode 1)
   (scroll-bar-mode -1)
-  (setq modus-themes-mode-line '(accented borderless 1.0))
-  (load-theme 'modus-operandi)
+  ;; (setq modus-themes-mode-line '(accented borderless 1.0))
+  ;; (load-theme 'modus-operandi)
   (set-face-attribute 'default nil :height 140 :family "JetBrains Mono")
   (auto-save-visited-mode 1)
   (setq calendar-week-start-day 1)
@@ -78,7 +82,20 @@
   (windmove-default-keybindings '(C S))
   (winner-mode 1)
   (add-hook 'compilation-filter-hook 'ansi-color-compilation-filter)
-  (add-hook 'compilation-filter-hook 'ansi-osc-compilation-filter))
+  (add-hook 'compilation-filter-hook 'ansi-osc-compilation-filter)
+  (add-hook 'tsx-ts-mode-hook 'eglot-ensure)
+  (add-hook 'typescript-ts-mode-hook 'eglot-ensure)
+  (add-hook 'typescript-ts-mode-hook #'(lambda () (setq-local js-indent-level 2)))
+  (add-hook 'tsx-ts-mode-hook #'(lambda () (setq-local js-indent-level 2)))
+  (add-hook 'typescript-ts-mode-hook #'(lambda () (setq-local js-jsx-indent-level 2)))
+  (add-hook 'tsx-ts-mode-hook #'(lambda () (setq-local js-jsx-indent-level 2)))
+  :mode
+  ("\\.tsx\\'" . tsx-ts-mode)
+  ("\\.ts\\'" . typescript-ts-mode))
+
+(use-package ef-themes
+  :config
+  (load-theme 'ef-maris-light t))
 
 (use-package vertico
   :config
@@ -112,8 +129,9 @@
 (use-package corfu
   :init
   (global-corfu-mode 1)
-  :bind (:map corfu-map
-	      ("RET" . nil)))
+  :custom
+  (corfu-auto t)
+  (corfu-auto-prefix 3))
 
 (use-package doom-modeline
   :config
@@ -125,7 +143,18 @@
   :config
   (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
 
-(use-package vterm)
+(use-package dired
+  :ensure nil
+  :config
+  (add-hook 'dired-mode-hook 'dired-hide-details-mode))
+
+(use-package nerd-icons-dired
+  :hook
+  (dired-mode . nerd-icons-dired-mode))
+
+(use-package vterm
+  :config
+  (global-set-key (kbd "<f8>") 'vterm))
 
 (use-package treemacs
   :config
@@ -136,42 +165,46 @@
   :config
   (setq eglot-events-buffer-size 0)
   (setq-default eglot-workspace-configuration
-                  '(:pylsp (:plugins (
-                                      :flake8 (:enabled :json-false)
-                                      :pycodestyle (:enabled :json-false)
-                                      :pyflakes (:enabled :json-false)
-                                      :mccabe (:enabled :json-false)
-                                      :mypy (:enabled :json-false)
-                                      :ruff (:enabled t
-					     :formatEnabled t
-					     :format ["I"]
-                                             :lineLength 160
-                                             :targetVersion "py311")
-                                      :isort (:enabled t)
-                                      )
-                                     :configurationSources ["flake8"])
-                           :terraform-ls (:prefillRequiredFields t)
-                           :typescript-language-server (:typescript (:format (:indentSize 2)))))
+                '(:pylsp (:plugins (
+                                    :flake8 (:enabled :json-false)
+                                    :pycodestyle (:enabled :json-false)
+                                    :pyflakes (:enabled :json-false)
+                                    :mccabe (:enabled :json-false)
+                                    :mypy (:enabled :json-false)
+                                    :ruff (:enabled t
+						    :formatEnabled t
+						    :format ["I"]
+						    :lineLength 160
+						    :targetVersion "py311")
+                                    :isort (:enabled t)
+				    ;;:rope_autoimport (:enabled t) ;; (Slow AF)
+                                    )
+                                   :configurationSources ["flake8"])
+                         :terraform-ls (:prefillRequiredFields t)))
   (set-face-attribute 'eglot-diagnostic-tag-unnecessary-face nil :underline t :slant 'italic)
-  :bind (:map eglot-mode-map
-	      ("C-c l r" . eglot-rename)
-	      ("C-c l a" . eglot-code-actions)))
+  (define-key eglot-mode-map (kbd "C-c l r") 'eglot-rename)
+  (define-key eglot-mode-map (kbd "C-c l a") 'eglot-code-actions)
+  (define-key eglot-mode-map (kbd "C-c l =") 'eglot-format-buffer))
 
 (use-package python
   :ensure nil
   :config
-  (add-hook 'python-mode-hook 'eglot-ensure)
-  (defun add-eglot-format-before-save ()
-    "Add format on before save hook from eglot"
-    (add-hook 'before-save-hook #'(lambda () (when eglot--managed-mode (eglot-format-buffer))) nil t))
-  (add-hook 'python-mode-hook 'add-eglot-format-before-save))
+  (add-hook 'python-ts-mode-hook 'eglot-ensure)
+  (defun sergio/format-buffer-on-save ()
+    (add-hook 'before-save-hook 'eglot-format-buffer nil t))
+  (add-hook 'python-ts-mode-hook 'sergio/format-buffer-on-save)
+  :mode
+  ("\\.py\\'" . python-ts-mode)
+  )
 
 (use-package pyvenv
   :config
   (pyvenv-mode 1)
   (pyvenv-tracking-mode 1))
 
-(use-package terraform-mode)
+(use-package terraform-mode
+  :hook
+  (terraform-mode . eglot-ensure))
 
 (use-package cape
   :config
@@ -238,8 +271,9 @@
 (use-package denote
   :bind
   ("C-c C-n" . denote-open-or-create)
+  ("C-c n" . denote-open-or-create)
   :custom
-  (denote-directory "~/Documents/Notes/"))
+  (denote-directory (if (eq system-type 'darwin) "~/Library/CloudStorage/GoogleDrive-sergiolib@gmail.com/My Drive/Notes/" "~/Documents/Notes/")))
 
 (use-package org
   :ensure nil
@@ -252,22 +286,73 @@
   (org-agenda-files (append (f-files "~/Documents/Notes" #'(lambda (f) (s-ends-with? ".org" f)) t) '("~/Insync/sergiolib@gmail.com/Google Drive/Agenda.org")))
   (org-default-notes-file "~/Insync/sergiolib@gmail.com/Google Drive/CapturedTasks.org")
   :hook
-  (org-mode . org-indent-mode))
+  (org-mode . org-indent-mode)
+  :config
+  (require 'org-tempo)
+  (add-to-list 'org-structure-template-alist '("sql" . "src sql"))
+  (add-hook
+   'org-mode-hook
+   (lambda ()
+     (setq-local electric-pair-inhibit-predicate
+		 `(lambda (c)
+                    (if (char-equal c ?<) t (,electric-pair-inhibit-predicate c))))))
+  (require 'ob-sql)
+  (org-babel-do-load-languages
+   'org-babel-load-languages '((emacs-lisp . t)
+			       (sql . t))))
+(use-package avy
+  :bind ("C-c C-SPC" . avy-goto-char))
+
+(use-package combobulate
+  :ensure (:type git :host github :repo "mickeynp/combobulate")
+  :init
+  (setq combobulate-key-prefix "C-c o")
+  :hook
+  ((python-ts-mode . combobulate-mode)
+   (js-ts-mode . combobulate-mode)
+   (go-mode . go-ts-mode)
+   (html-ts-mode . combobulate-mode)
+   (css-ts-mode . combobulate-mode)
+   (yaml-ts-mode . combobulate-mode)
+   (typescript-ts-mode . combobulate-mode)
+   (json-ts-mode . combobulate-mode)
+   (tsx-ts-mode . combobulate-mode)))
+
+(use-package editorconfig
+  :config
+  (add-to-list 'editorconfig-indentation-alist '(tsx-ts-mode . typescript-ts-mode-indent-offset))
+  (add-hook 'tsx-ts-mode-hook #'editorconfig-mode-apply)
+  :hook (tsx-ts-mode . editorconfig-mode))
+
+(use-package prettier-js
+  :hook
+  (tsx-ts-mode . prettier-js-mode))
+
+(use-package docker
+  :config
+  (setq docker-compose-command "docker compose")
+  (setq docker-run-async-with-buffer-function)
+  :bind
+  ("C-c d" . docker))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   '("6ccb6eb66c70661934a94f395d755a84f3306732271c55d41a501757e4c39fcb" default))
  '(package-selected-packages '(eglot))
  '(safe-local-variable-values
-   '((c-default-style . "k&r")
-     (eval setenv "PYTHONPATH" "~/Library/Caches/pypoetry/virtualenvs/anonymizer-A6bZtkw6-py3.12/lib/python3.12/site-packages/")
-     (eval setenv "PYTHONPATH" "~/Library/Caches/pypoetry/virtualenvs/")
-     (eval setenv "PYTHONPATH" "~/Library/Caches/pypoetry/virtualenvs/non-package-mode-L3eHqBKk-py3.12/lib/python3.12/site-packages/"))))
+   '((eval setenv "PYTHONPATH" "/Users/sliberman/Documents/src/Substorm.Anonymizer/api/.venv/lib/python3.12/site-packages/")
+	 (c-default-style . "k&r")
+	 (eval setenv "PYTHONPATH" "~/Library/Caches/pypoetry/virtualenvs/anonymizer-A6bZtkw6-py3.12/lib/python3.12/site-packages/")
+	 (eval setenv "PYTHONPATH" "~/Library/Caches/pypoetry/virtualenvs/")
+	 (eval setenv "PYTHONPATH" "~/Library/Caches/pypoetry/virtualenvs/non-package-mode-L3eHqBKk-py3.12/lib/python3.12/site-packages/"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+(put 'downcase-region 'disabled nil)
