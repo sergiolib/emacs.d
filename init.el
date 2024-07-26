@@ -54,6 +54,7 @@
 (use-package emacs
   :ensure nil
   :config
+  (setq tab-width 4)
   ;;disable splash screen and startup message
   (setq inhibit-startup-message t)
   (setq initial-scratch-message nil)
@@ -91,20 +92,6 @@
   :mode
   ("\\.tsx\\'" . tsx-ts-mode)
   ("\\.ts\\'" . typescript-ts-mode))
-
-(use-package apheleia
-  :config
-  (setf (alist-get 'prettier-json apheleia-formatters)
-        '("prettier"
-	  "--trailing-comma" "es5"
-	  "--bracket-spacing" "true"
-          "--single-quote" "true"
-          "--semi" "false"
-          "--print-width" "100"
-	  "--tab-width" "4"
-	  "--stdin-filepath" filepath))
-  (add-hook 'tsx-ts-mode-hook 'apheleia-mode)
-  (add-hook 'typescript-ts-mode-hook 'apheleia-mode))
 
 (use-package ef-themes
   :config
@@ -166,8 +153,8 @@
   (dired-mode . nerd-icons-dired-mode))
 
 (use-package vterm
-  :bind
-  ("<f8>" . vterm))
+  :config
+  (global-set-key (kbd "<f8>") 'vterm))
 
 (use-package treemacs
   :config
@@ -176,7 +163,7 @@
 (use-package eglot
   :ensure nil
   :config
-  (setq eglot-events-buffer-size 2000000)
+  (setq eglot-events-buffer-size 0)
   (setq-default eglot-workspace-configuration
                 '(:pylsp (:plugins (
                                     :flake8 (:enabled :json-false)
@@ -193,8 +180,7 @@
 				    ;;:rope_autoimport (:enabled t) ;; (Slow AF)
                                     )
                                    :configurationSources ["flake8"])
-                         :terraform-ls (:prefillRequiredFields t)
-                         :typescript-language-server (:typescript (:format (:indentSize 2)))))
+                         :terraform-ls (:prefillRequiredFields t)))
   (set-face-attribute 'eglot-diagnostic-tag-unnecessary-face nil :underline t :slant 'italic)
   (define-key eglot-mode-map (kbd "C-c l r") 'eglot-rename)
   (define-key eglot-mode-map (kbd "C-c l a") 'eglot-code-actions)
@@ -203,7 +189,13 @@
 (use-package python
   :ensure nil
   :config
-  (add-hook 'python-mode-hook 'eglot-ensure))
+  (add-hook 'python-ts-mode-hook 'eglot-ensure)
+  (defun sergio/format-buffer-on-save ()
+    (add-hook 'before-save-hook 'eglot-format-buffer nil t))
+  (add-hook 'python-ts-mode-hook 'sergio/format-buffer-on-save)
+  :mode
+  ("\\.py\\'" . python-ts-mode)
+  )
 
 (use-package pyvenv
   :config
@@ -307,19 +299,12 @@
    'org-babel-load-languages '((emacs-lisp . t)
 			       (sql . t))))
 (use-package avy
-  :bind ("C-c C-z" . avy-goto-char))
+  :bind ("C-c C-SPC" . avy-goto-char))
 
 (use-package combobulate
   :ensure (:type git :host github :repo "mickeynp/combobulate")
   :init
-  ;; You can customize Combobulate's key prefix here.
-  ;; Note that you may have to restart Emacs for this to take effect!
   (setq combobulate-key-prefix "C-c o")
-  
-  ;; Optional, but recommended.
-  ;;
-  ;; You can manually enable Combobulate with `M-x
-  ;; combobulate-mode'.
   :hook
   ((python-ts-mode . combobulate-mode)
    (js-ts-mode . combobulate-mode)
@@ -329,8 +314,24 @@
    (yaml-ts-mode . combobulate-mode)
    (typescript-ts-mode . combobulate-mode)
    (json-ts-mode . combobulate-mode)
-   (tsx-ts-mode . combobulate-mode))
-  )
+   (tsx-ts-mode . combobulate-mode)))
+
+(use-package editorconfig
+  :config
+  (add-to-list 'editorconfig-indentation-alist '(tsx-ts-mode . typescript-ts-mode-indent-offset))
+  (add-hook 'tsx-ts-mode-hook #'editorconfig-mode-apply)
+  :hook (tsx-ts-mode . editorconfig-mode))
+
+(use-package prettier-js
+  :hook
+  (tsx-ts-mode . prettier-js-mode))
+
+(use-package docker
+  :config
+  (setq docker-compose-command "docker compose")
+  (setq docker-run-async-with-buffer-function)
+  :bind
+  ("C-c d" . docker))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -342,13 +343,14 @@
  '(package-selected-packages '(eglot))
  '(safe-local-variable-values
    '((eval setenv "PYTHONPATH" "/Users/sliberman/Documents/src/Substorm.Anonymizer/api/.venv/lib/python3.12/site-packages/")
-     (c-default-style . "k&r")
-     (eval setenv "PYTHONPATH" "~/Library/Caches/pypoetry/virtualenvs/anonymizer-A6bZtkw6-py3.12/lib/python3.12/site-packages/")
-     (eval setenv "PYTHONPATH" "~/Library/Caches/pypoetry/virtualenvs/")
-     (eval setenv "PYTHONPATH" "~/Library/Caches/pypoetry/virtualenvs/non-package-mode-L3eHqBKk-py3.12/lib/python3.12/site-packages/"))))
+	 (c-default-style . "k&r")
+	 (eval setenv "PYTHONPATH" "~/Library/Caches/pypoetry/virtualenvs/anonymizer-A6bZtkw6-py3.12/lib/python3.12/site-packages/")
+	 (eval setenv "PYTHONPATH" "~/Library/Caches/pypoetry/virtualenvs/")
+	 (eval setenv "PYTHONPATH" "~/Library/Caches/pypoetry/virtualenvs/non-package-mode-L3eHqBKk-py3.12/lib/python3.12/site-packages/"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+(put 'downcase-region 'disabled nil)
