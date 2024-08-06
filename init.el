@@ -1,4 +1,4 @@
-e(setq backup-directory-alist `(("." . "~/.saves")))
+(setq backup-directory-alist `(("." . "~/.saves")))
 (when (eq system-type 'darwin)
   (setq mac-right-option-modifier 'none))
 
@@ -160,6 +160,7 @@ e(setq backup-directory-alist `(("." . "~/.saves")))
 
 (use-package treemacs
   :config
+  (treemacs)
   (treemacs-project-follow-mode 1))
 
 (use-package eglot
@@ -326,7 +327,7 @@ e(setq backup-directory-alist `(("." . "~/.saves")))
 (use-package editorconfig
   :config
   (add-to-list 'editorconfig-indentation-alist '(tsx-ts-mode . typescript-ts-mode-indent-offset))
-  (add-hook 'tsx-ts-mode-hook #'editorconfig-mode-apply)
+  (add-hook 'tsx-ts-mode-hook #'editorconfig-apply)
   :hook (tsx-ts-mode . editorconfig-mode))
 
 (use-package prettier-js
@@ -349,11 +350,47 @@ e(setq backup-directory-alist `(("." . "~/.saves")))
    '("6ccb6eb66c70661934a94f395d755a84f3306732271c55d41a501757e4c39fcb" default))
  '(package-selected-packages '(eglot))
  '(safe-local-variable-values
-   '((eval setenv "PYTHONPATH" "/Users/sliberman/Documents/src/Substorm.Anonymizer/api/.venv/lib/python3.12/site-packages/")
-	 (c-default-style . "k&r")
-	 (eval setenv "PYTHONPATH" "~/Library/Caches/pypoetry/virtualenvs/anonymizer-A6bZtkw6-py3.12/lib/python3.12/site-packages/")
-	 (eval setenv "PYTHONPATH" "~/Library/Caches/pypoetry/virtualenvs/")
-	 (eval setenv "PYTHONPATH" "~/Library/Caches/pypoetry/virtualenvs/non-package-mode-L3eHqBKk-py3.12/lib/python3.12/site-packages/"))))
+   '((eval let
+	   ((buffer-name "api"))
+	   (when
+	       (not
+		(get-buffer-process buffer-name))
+	     (async-shell-command
+	      (concat "docker compose up db -d && " "cd api/ && " "poetry run aerich upgrade && " "poetry run python scripts/create_user.py -u admin -p admin -n Admin -e admin@substorm.ai -s &&" "poetry run uvicorn --reload --host 0.0.0.0 anonymizer.main:app")
+	      buffer-name)))
+     (let
+	 ((buffer-name "db"))
+       (when
+	   (not
+	    (get-buffer-process buffer-name))
+	 (async-shell-command
+	  (concat "docker compose up db -d && " "cd api/scripts && " "poetry run python create_user.py -u admin -p admin -n Admin -e admin@substorm.ai -s")
+	  buffer-name)))
+     (let
+	 ((buffer-name "db"))
+       (when
+	   (not
+	    (get-buffer-process buffer-name))
+	 (async-shell-command "docker compose up db -d && cd api/scripts && poetry run python create_user.py -u admin -p admin -n Admin -e admin@substorm.ai -s" buffer-name)))
+     (eval let
+	   ((buffer-name "ui"))
+	   (when
+	       (not
+		(get-buffer-process buffer-name))
+	     (async-shell-command "cd ui/ && npm start" buffer-name)))
+     (eval let
+	   ((buffer-name "api"))
+	   (when
+	       (not
+		(get-buffer-process buffer-name))
+	     (async-shell-command "cd api/ && poetry run uvicorn --host 0.0.0.0 --port 9797 --reload anonymizer.main:app" buffer-name)))
+     (eval async-shell-command "echo \"hello!\"")
+     (eval async-command-shell "echo \"hello!\"")
+     (eval setenv "PYTHONPATH" "/Users/sliberman/Documents/src/Substorm.Anonymizer/api/.venv/lib/python3.12/site-packages/")
+     (c-default-style . "k&r")
+     (eval setenv "PYTHONPATH" "~/Library/Caches/pypoetry/virtualenvs/anonymizer-A6bZtkw6-py3.12/lib/python3.12/site-packages/")
+     (eval setenv "PYTHONPATH" "~/Library/Caches/pypoetry/virtualenvs/")
+     (eval setenv "PYTHONPATH" "~/Library/Caches/pypoetry/virtualenvs/non-package-mode-L3eHqBKk-py3.12/lib/python3.12/site-packages/"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
