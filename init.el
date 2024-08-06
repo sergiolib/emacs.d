@@ -54,6 +54,7 @@
 (use-package emacs
   :ensure nil
   :config
+  (setq-default cursor-type 'bar)
   (setq tab-width 4)
   ;;disable splash screen and startup message
   (setq inhibit-startup-message t)
@@ -62,9 +63,10 @@
   (tool-bar-mode -1)
   (menu-bar-mode 1)
   (scroll-bar-mode -1)
+  (blink-cursor-mode -1)
   ;; (setq modus-themes-mode-line '(accented borderless 1.0))
   ;; (load-theme 'modus-operandi)
-  (set-face-attribute 'default nil :height 140 :family "JetBrains Mono")
+  (set-face-attribute 'default nil :height 160 :family "JetBrains Mono")
   (auto-save-visited-mode 1)
   (setq calendar-week-start-day 1)
   (recentf-mode 1)
@@ -158,6 +160,7 @@
 
 (use-package treemacs
   :config
+  (treemacs)
   (treemacs-project-follow-mode 1))
 
 (use-package eglot
@@ -189,13 +192,12 @@
 (use-package python
   :ensure nil
   :config
-  (add-hook 'python-ts-mode-hook 'eglot-ensure)
+  (add-hook 'python-base-mode-hook 'eglot-ensure)
   (defun sergio/format-buffer-on-save ()
     (add-hook 'before-save-hook 'eglot-format-buffer nil t))
-  (add-hook 'python-ts-mode-hook 'sergio/format-buffer-on-save)
+  (add-hook 'python-base-mode-hook 'sergio/format-buffer-on-save)
   :mode
-  ("\\.py\\'" . python-ts-mode)
-  )
+  ("\\.py\\'" . python-ts-mode))
 
 (use-package pyvenv
   :config
@@ -283,7 +285,11 @@
   ("C-c s" . org-store-link)
   :custom
   (org-indent-indentation-per-level 1)
-  (org-agenda-files (append (f-files "~/Documents/Notes" #'(lambda (f) (s-ends-with? ".org" f)) t) '("~/Insync/sergiolib@gmail.com/Google Drive/Agenda.org")))
+  (org-agenda-files (if (eq system-type 'gnu/linux)
+			(append
+			 (f-files "~/Documents/Notes" #'(lambda (f) (s-ends-with? ".org" f)) t)
+			 '("~/Insync/sergiolib@gmail.com/Google Drive/Agenda.org"))
+		      '("~/Documents/agenda.org")))
   (org-default-notes-file "~/Insync/sergiolib@gmail.com/Google Drive/CapturedTasks.org")
   :hook
   (org-mode . org-indent-mode)
@@ -321,7 +327,7 @@
 (use-package editorconfig
   :config
   (add-to-list 'editorconfig-indentation-alist '(tsx-ts-mode . typescript-ts-mode-indent-offset))
-  (add-hook 'tsx-ts-mode-hook #'editorconfig-mode-apply)
+  (add-hook 'tsx-ts-mode-hook #'editorconfig-apply)
   :hook (tsx-ts-mode . editorconfig-mode))
 
 (use-package prettier-js
@@ -348,11 +354,47 @@
    '("6ccb6eb66c70661934a94f395d755a84f3306732271c55d41a501757e4c39fcb" default))
  '(package-selected-packages '(eglot))
  '(safe-local-variable-values
-   '((eval setenv "PYTHONPATH" "/Users/sliberman/Documents/src/Substorm.Anonymizer/api/.venv/lib/python3.12/site-packages/")
-	 (c-default-style . "k&r")
-	 (eval setenv "PYTHONPATH" "~/Library/Caches/pypoetry/virtualenvs/anonymizer-A6bZtkw6-py3.12/lib/python3.12/site-packages/")
-	 (eval setenv "PYTHONPATH" "~/Library/Caches/pypoetry/virtualenvs/")
-	 (eval setenv "PYTHONPATH" "~/Library/Caches/pypoetry/virtualenvs/non-package-mode-L3eHqBKk-py3.12/lib/python3.12/site-packages/"))))
+   '((eval let
+	   ((buffer-name "api"))
+	   (when
+	       (not
+		(get-buffer-process buffer-name))
+	     (async-shell-command
+	      (concat "docker compose up db -d && " "cd api/ && " "poetry run aerich upgrade && " "poetry run python scripts/create_user.py -u admin -p admin -n Admin -e admin@substorm.ai -s &&" "poetry run uvicorn --reload --host 0.0.0.0 anonymizer.main:app")
+	      buffer-name)))
+     (let
+	 ((buffer-name "db"))
+       (when
+	   (not
+	    (get-buffer-process buffer-name))
+	 (async-shell-command
+	  (concat "docker compose up db -d && " "cd api/scripts && " "poetry run python create_user.py -u admin -p admin -n Admin -e admin@substorm.ai -s")
+	  buffer-name)))
+     (let
+	 ((buffer-name "db"))
+       (when
+	   (not
+	    (get-buffer-process buffer-name))
+	 (async-shell-command "docker compose up db -d && cd api/scripts && poetry run python create_user.py -u admin -p admin -n Admin -e admin@substorm.ai -s" buffer-name)))
+     (eval let
+	   ((buffer-name "ui"))
+	   (when
+	       (not
+		(get-buffer-process buffer-name))
+	     (async-shell-command "cd ui/ && npm start" buffer-name)))
+     (eval let
+	   ((buffer-name "api"))
+	   (when
+	       (not
+		(get-buffer-process buffer-name))
+	     (async-shell-command "cd api/ && poetry run uvicorn --host 0.0.0.0 --port 9797 --reload anonymizer.main:app" buffer-name)))
+     (eval async-shell-command "echo \"hello!\"")
+     (eval async-command-shell "echo \"hello!\"")
+     (eval setenv "PYTHONPATH" "/Users/sliberman/Documents/src/Substorm.Anonymizer/api/.venv/lib/python3.12/site-packages/")
+     (c-default-style . "k&r")
+     (eval setenv "PYTHONPATH" "~/Library/Caches/pypoetry/virtualenvs/anonymizer-A6bZtkw6-py3.12/lib/python3.12/site-packages/")
+     (eval setenv "PYTHONPATH" "~/Library/Caches/pypoetry/virtualenvs/")
+     (eval setenv "PYTHONPATH" "~/Library/Caches/pypoetry/virtualenvs/non-package-mode-L3eHqBKk-py3.12/lib/python3.12/site-packages/"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
