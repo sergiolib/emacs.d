@@ -1,4 +1,4 @@
-(setq backup-directory-alist `(("." . "~/.saves")))
+e(setq backup-directory-alist `(("." . "~/.saves")))
 (when (eq system-type 'darwin)
   (setq mac-right-option-modifier 'none))
 
@@ -64,7 +64,7 @@
   (scroll-bar-mode -1)
   ;; (setq modus-themes-mode-line '(accented borderless 1.0))
   ;; (load-theme 'modus-operandi)
-  (set-face-attribute 'default nil :height 140 :family "JetBrains Mono")
+  (set-face-attribute 'default nil :height 160 :family "JetBrains Mono")
   (auto-save-visited-mode 1)
   (setq calendar-week-start-day 1)
   (recentf-mode 1)
