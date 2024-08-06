@@ -54,7 +54,7 @@
 (use-package emacs
   :ensure nil
   :config
-  (setq cursor-type 'bar)
+  (setq-default cursor-type 'bar)
   (setq tab-width 4)
   ;;disable splash screen and startup message
   (setq inhibit-startup-message t)
