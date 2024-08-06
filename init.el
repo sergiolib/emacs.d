@@ -54,6 +54,7 @@ e(setq backup-directory-alist `(("." . "~/.saves")))
 (use-package emacs
   :ensure nil
   :config
+  (setq cursor-type 'bar)
   (setq tab-width 4)
   ;;disable splash screen and startup message
   (setq inhibit-startup-message t)
@@ -189,13 +190,12 @@ e(setq backup-directory-alist `(("." . "~/.saves")))
 (use-package python
   :ensure nil
   :config
-  (add-hook 'python-ts-mode-hook 'eglot-ensure)
+  (add-hook 'python-base-mode-hook 'eglot-ensure)
   (defun sergio/format-buffer-on-save ()
     (add-hook 'before-save-hook 'eglot-format-buffer nil t))
-  (add-hook 'python-ts-mode-hook 'sergio/format-buffer-on-save)
+  (add-hook 'python-base-mode-hook 'sergio/format-buffer-on-save)
   :mode
-  ("\\.py\\'" . python-ts-mode)
-  )
+  ("\\.py\\'" . python-ts-mode))
 
 (use-package pyvenv
   :config
