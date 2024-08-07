@@ -103,6 +103,7 @@ If FRAME is omitted or nil, use currently selected frame."
     (set-frame-height (selected-frame) 80)
     (set-frame-width (selected-frame) 200)
     (my/frame-recenter))
+  (unbind-key (kbd "C-x C-z"))  ;; Unbind suspend frame
   :mode
   ("\\.tsx\\'" . tsx-ts-mode)
   ("\\.ts\\'" . typescript-ts-mode))
