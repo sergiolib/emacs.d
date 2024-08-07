@@ -361,6 +361,8 @@ If FRAME is omitted or nil, use currently selected frame."
   :hook
   (prog-mode . rainbow-mode))
 
+(use-package markdown-mode)
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
