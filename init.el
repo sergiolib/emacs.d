@@ -353,9 +353,10 @@ If FRAME is omitted or nil, use currently selected frame."
 (use-package docker
   :config
   (setq docker-compose-command "docker compose")
-  (setq docker-run-async-with-buffer-function)
-  :bind
-  ("C-c d" . docker))
+  (global-set-key (kbd "C-c C-d d") 'docker)
+  (global-set-key (kbd "C-c C-d C-d") 'docker)
+  (global-set-key (kbd "C-c C-d c") 'docker-compose)
+  (global-set-key (kbd "C-c C-d C-c") 'docker-compose))
 
 (use-package rainbow-mode
   :hook
