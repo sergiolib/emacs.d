@@ -257,7 +257,10 @@ If FRAME is omitted or nil, use currently selected frame."
   :bind
   ("C-c g" . magit-status))
 
-(use-package yaml-mode)
+(use-package yaml-ts-mode
+  :ensure nil
+  :mode
+  ("\\.yml\\'" . yaml-ts-mode))
 
 (use-package direnv
   :config
