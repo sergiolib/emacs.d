@@ -67,7 +67,7 @@
   ;; (setq modus-themes-mode-line '(accented borderless 1.0))
   ;; (load-theme 'modus-operandi)
   (set-face-attribute 'default nil :height 160 :family "JetBrains Mono")
-  (auto-save-visited-mode 1)
+  (auto-save-visited-mode -1)
   (setq calendar-week-start-day 1)
   (recentf-mode 1)
   (global-set-key (kbd "<home>") 'back-to-indentation)
@@ -91,6 +91,18 @@
   (add-hook 'tsx-ts-mode-hook #'(lambda () (setq-local js-indent-level 2)))
   (add-hook 'typescript-ts-mode-hook #'(lambda () (setq-local js-jsx-indent-level 2)))
   (add-hook 'tsx-ts-mode-hook #'(lambda () (setq-local js-jsx-indent-level 2)))
+  (defun my/frame-recenter (&optional frame)
+    "Center FRAME on the screen.
+FRAME can be a frame name, a terminal name, or a frame.
+If FRAME is omitted or nil, use currently selected frame."
+    (interactive)
+    (unless (eq 'maximised (frame-parameter nil 'fullscreen))
+      (modify-frame-parameters
+       frame '((user-position . t) (top . 0.5) (left . 0.5)))))
+  (when (window-system)
+    (set-frame-height (selected-frame) 80)
+    (set-frame-width (selected-frame) 200)
+    (my/frame-recenter))
   :mode
   ("\\.tsx\\'" . tsx-ts-mode)
   ("\\.ts\\'" . typescript-ts-mode))
@@ -118,7 +130,7 @@
 (use-package consult
   :bind
   ("C-c C-s" . consult-line)
-  ("C-x C-b" . consult-buffer)
+  ("C-x b" . consult-buffer)
   ("C-x ," . consult-recent-file))
 
 (use-package embark-consult)
