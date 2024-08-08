@@ -110,7 +110,7 @@ If FRAME is omitted or nil, use currently selected frame."
 
 (use-package ef-themes
   :config
-  (load-theme 'ef-maris-light t))
+  (load-theme 'ef-elea-dark t))
 
 (use-package vertico
   :config
