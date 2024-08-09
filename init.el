@@ -325,20 +325,6 @@ If FRAME is omitted or nil, use currently selected frame."
 (use-package avy
   :bind ("C-c C-SPC" . avy-goto-char))
 
-(use-package combobulate
-  :ensure (:type git :host github :repo "mickeynp/combobulate")
-  :init
-  (setq combobulate-key-prefix "C-c o")
-  :hook
-  ((python-ts-mode . combobulate-mode)
-   (js-ts-mode . combobulate-mode)
-   (go-mode . go-ts-mode)
-   (html-ts-mode . combobulate-mode)
-   (css-ts-mode . combobulate-mode)
-   (yaml-ts-mode . combobulate-mode)
-   (json-ts-mode . combobulate-mode)
-   (tsx-ts-mode . combobulate-mode)))
-
 (use-package editorconfig
   :config
   (add-to-list 'editorconfig-indentation-alist '(tsx-ts-mode . typescript-ts-mode-indent-offset))
