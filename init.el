@@ -336,7 +336,6 @@ If FRAME is omitted or nil, use currently selected frame."
    (html-ts-mode . combobulate-mode)
    (css-ts-mode . combobulate-mode)
    (yaml-ts-mode . combobulate-mode)
-   (typescript-ts-mode . combobulate-mode)
    (json-ts-mode . combobulate-mode)
    (tsx-ts-mode . combobulate-mode)))
 
