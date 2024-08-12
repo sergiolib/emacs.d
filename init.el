@@ -104,9 +104,17 @@ If FRAME is omitted or nil, use currently selected frame."
     (set-frame-width (selected-frame) 200)
     (my/frame-recenter))
   (unbind-key (kbd "C-x C-z"))  ;; Unbind suspend frame
+  (unbind-key (kbd "C-z"))  ;; Unbind suspend frame
+  (global-set-key (kbd "C-c e") 'open-init-file)
+  (setq custom-file "~/.emacs.d/custom.el")
   :mode
   ("\\.tsx\\'" . tsx-ts-mode)
-  ("\\.ts\\'" . typescript-ts-mode))
+  ("\\.ts\\'" . typescript-ts-mode)
+  :init
+  (defun open-init-file ()
+    "Open the init file"
+    (interactive)
+    (find-file "~/.emacs.d/init.el")))
 
 (use-package ef-themes
   :config
@@ -120,16 +128,19 @@ If FRAME is omitted or nil, use currently selected frame."
   (vertico-cycle t))
 
 (use-package marginalia
+  :ensure (:tag "1.7")
   :config
   (marginalia-mode 1))
 
 (use-package embark
+  :ensure (:tag "1.1")
   :custom
   (embark-quit-after-action nil)
   :bind
   ("C-." . embark-act))
 
 (use-package consult
+  :ensure (:tag "1.8")  
   :bind
   ("C-c C-s" . consult-line)
   ("C-x b" . consult-buffer)
@@ -138,6 +149,7 @@ If FRAME is omitted or nil, use currently selected frame."
 (use-package embark-consult)
 
 (use-package orderless
+  :ensure (:tag "1.1")
   :custom
   (completion-styles '(orderless basic))
   (completion-category-overrides '((file (styles basic partial-completion)))))
@@ -148,15 +160,18 @@ If FRAME is omitted or nil, use currently selected frame."
   (global-corfu-mode 1)
   :custom
   (corfu-auto t)
-  (corfu-auto-prefix 3))
+  (corfu-auto-prefix 1))
 
 (use-package doom-modeline
+  :ensure (:tag "v4.1.0")
   :config
   (doom-modeline-mode 1))
 
-(use-package all-the-icons)
+(use-package all-the-icons
+  :ensure (:tag "5.0.0"))
 
 (use-package nerd-icons-corfu
+  :ensure (:tag "v0.3.0")
   :config
   (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
 
@@ -182,6 +197,8 @@ If FRAME is omitted or nil, use currently selected frame."
   :ensure nil
   :config
   (setq eglot-events-buffer-size 0)
+  (setq gc-cons-threshold 1000000000
+	read-process-output-max (* 1024 1024))
   (setq-default eglot-workspace-configuration
                 '(:pylsp (:plugins (
                                     :flake8 (:enabled :json-false)
@@ -195,7 +212,7 @@ If FRAME is omitted or nil, use currently selected frame."
 						    :lineLength 160
 						    :targetVersion "py311")
                                     :isort (:enabled t)
-				    ;;:rope_autoimport (:enabled t) ;; (Slow AF)
+				    :rope_autoimport (:enabled t) ;; (Slow AF)
                                     )
                                    :configurationSources ["flake8"])
                          :terraform-ls (:prefillRequiredFields t)))
@@ -208,9 +225,9 @@ If FRAME is omitted or nil, use currently selected frame."
   :ensure nil
   :config
   (add-hook 'python-base-mode-hook 'eglot-ensure)
-  (defun sergio/format-buffer-on-save ()
-    (add-hook 'before-save-hook 'eglot-format-buffer nil t))
-  (add-hook 'python-base-mode-hook 'sergio/format-buffer-on-save)
+  ;; (defun sergio/format-buffer-on-save ()
+    ;; (add-hook 'before-save-hook 'eglot-format-buffer nil t))
+  ;; (add-hook 'python-base-mode-hook 'sergio/format-buffer-on-save)
   :mode
   ("\\.py\\'" . python-ts-mode))
 
@@ -241,16 +258,6 @@ If FRAME is omitted or nil, use currently selected frame."
 (use-package which-key
   :config
   (which-key-mode 1))
-
-(use-package emacs
-  :ensure nil
-  :init
-  (defun open-init-file ()
-    "Open the init file"
-    (interactive)
-    (find-file "~/.emacs.d/init.el"))
-  :bind
-  ("C-c e" . 'open-init-file))
 
 (use-package dockerfile-mode)
 
@@ -350,61 +357,3 @@ If FRAME is omitted or nil, use currently selected frame."
   (prog-mode . rainbow-mode))
 
 (use-package markdown-mode)
-
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   '("6ccb6eb66c70661934a94f395d755a84f3306732271c55d41a501757e4c39fcb" default))
- '(package-selected-packages '(eglot))
- '(safe-local-variable-values
-   '((eval let
-	   ((buffer-name "api"))
-	   (when
-	       (not
-		(get-buffer-process buffer-name))
-	     (async-shell-command
-	      (concat "docker compose up db -d && " "cd api/ && " "poetry run aerich upgrade && " "poetry run python scripts/create_user.py -u admin -p admin -n Admin -e admin@substorm.ai -s &&" "poetry run uvicorn --reload --host 0.0.0.0 anonymizer.main:app")
-	      buffer-name)))
-     (let
-	 ((buffer-name "db"))
-       (when
-	   (not
-	    (get-buffer-process buffer-name))
-	 (async-shell-command
-	  (concat "docker compose up db -d && " "cd api/scripts && " "poetry run python create_user.py -u admin -p admin -n Admin -e admin@substorm.ai -s")
-	  buffer-name)))
-     (let
-	 ((buffer-name "db"))
-       (when
-	   (not
-	    (get-buffer-process buffer-name))
-	 (async-shell-command "docker compose up db -d && cd api/scripts && poetry run python create_user.py -u admin -p admin -n Admin -e admin@substorm.ai -s" buffer-name)))
-     (eval let
-	   ((buffer-name "ui"))
-	   (when
-	       (not
-		(get-buffer-process buffer-name))
-	     (async-shell-command "cd ui/ && npm start" buffer-name)))
-     (eval let
-	   ((buffer-name "api"))
-	   (when
-	       (not
-		(get-buffer-process buffer-name))
-	     (async-shell-command "cd api/ && poetry run uvicorn --host 0.0.0.0 --port 9797 --reload anonymizer.main:app" buffer-name)))
-     (eval async-shell-command "echo \"hello!\"")
-     (eval async-command-shell "echo \"hello!\"")
-     (eval setenv "PYTHONPATH" "/Users/sliberman/Documents/src/Substorm.Anonymizer/api/.venv/lib/python3.12/site-packages/")
-     (c-default-style . "k&r")
-     (eval setenv "PYTHONPATH" "~/Library/Caches/pypoetry/virtualenvs/anonymizer-A6bZtkw6-py3.12/lib/python3.12/site-packages/")
-     (eval setenv "PYTHONPATH" "~/Library/Caches/pypoetry/virtualenvs/")
-     (eval setenv "PYTHONPATH" "~/Library/Caches/pypoetry/virtualenvs/non-package-mode-L3eHqBKk-py3.12/lib/python3.12/site-packages/"))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
-(put 'downcase-region 'disabled nil)
