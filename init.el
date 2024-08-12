@@ -113,6 +113,7 @@ If FRAME is omitted or nil, use currently selected frame."
   (load-theme 'ef-elea-dark t))
 
 (use-package vertico
+  :ensure (:tag "1.9")
   :config
   (vertico-mode 1)
   :custom
@@ -142,6 +143,7 @@ If FRAME is omitted or nil, use currently selected frame."
   (completion-category-overrides '((file (styles basic partial-completion)))))
 
 (use-package corfu
+  :ensure (:tag "1.5")
   :init
   (global-corfu-mode 1)
   :custom
@@ -232,7 +234,7 @@ If FRAME is omitted or nil, use currently selected frame."
     (add-hook 'completion-at-point-functions #'cape-file nil t))
   (defun add-cape-file-to-lisp-data-capfs ()
     (add-hook 'completion-at-point-functions #'cape-file nil t))
-  (add-hook 'python-mode-hook #'add-cape-file-to-python-capfs)
+  (add-hook 'python-base-mode-hook #'add-cape-file-to-python-capfs)
   (add-hook 'lisp-data-mode-hook #'add-cape-file-to-lisp-data-capfs)
   (add-hook 'terraform-mode-hook #'add-cape-file-to-tf-capfs))
 
