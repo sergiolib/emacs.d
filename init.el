@@ -127,6 +127,17 @@ If FRAME is omitted or nil, use currently selected frame."
   :custom
   (vertico-cycle t))
 
+(use-package vertico-mouse
+  :after vertico
+  :ensure nil
+  :config
+  (vertico-mouse-mode 1))
+
+(use-package vertico-repeat
+  :after vertico
+  :ensure nil
+  :bind	      ("C-c r" . 'vertico-repeat))
+
 (use-package marginalia
   :ensure (:tag "1.7")
   :config
@@ -192,6 +203,19 @@ If FRAME is omitted or nil, use currently selected frame."
   :config
   (treemacs)
   (treemacs-project-follow-mode 1))
+
+(use-package project
+  :ensure nil
+  :config
+  (defun sergio/project-vterm ()
+    (interactive)
+    (let ((default-directory (project-root (project-current))))
+      (vterm)))
+  (defun sergio/project-magit ()
+    (interactive)
+    (let ((default-directory (project-root (project-current))))
+      (magit-status)))
+  (add-to-list 'project-switch-commands '(sergio/project-magit "Magit" "m")))
 
 (use-package eglot
   :ensure nil
@@ -357,3 +381,11 @@ If FRAME is omitted or nil, use currently selected frame."
   (prog-mode . rainbow-mode))
 
 (use-package markdown-mode)
+
+(use-package rainbow-delimiters
+  :config
+  (rainbow-delimiters-mode 1))
+
+(use-package expand-region
+  :bind
+  ("C-'" . 'er/expand-region))
