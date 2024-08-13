@@ -384,7 +384,7 @@ If FRAME is omitted or nil, use currently selected frame."
 
 (use-package rainbow-delimiters
   :config
-  (rainbow-delimiters-mode 1))
+  (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
 
 (use-package expand-region
   :bind
