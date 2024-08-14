@@ -114,7 +114,8 @@ If FRAME is omitted or nil, use currently selected frame."
   (defun open-init-file ()
     "Open the init file"
     (interactive)
-    (find-file "~/.emacs.d/init.el")))
+    (find-file "~/.emacs.d/init.el"))
+  (setenv "PATH" (concat "/Library/TeX/texbin/:" (getenv "PATH"))))
 
 (use-package ef-themes
   :config
@@ -171,7 +172,10 @@ If FRAME is omitted or nil, use currently selected frame."
   (global-corfu-mode 1)
   :custom
   (corfu-auto t)
-  (corfu-auto-prefix 1))
+  (corfu-auto-prefix 1)
+  :config
+  (corfu-echo-mode 1)
+  (corfu-history-mode 1))
 
 (use-package doom-modeline
   :ensure (:tag "v4.1.0")
@@ -215,7 +219,16 @@ If FRAME is omitted or nil, use currently selected frame."
     (interactive)
     (let ((default-directory (project-root (project-current))))
       (magit-status)))
-  (add-to-list 'project-switch-commands '(sergio/project-magit "Magit" "m")))
+  (defun sergio/modify-dir-locals ()
+    (interactive)
+    (find-file (f-join (project-root (project-current)) ".dir-locals.el")))
+
+  (add-to-list 'project-switch-commands '(sergio/project-vterm "Vterm" "t"))
+  (add-to-list 'project-switch-commands '(sergio/project-magit "Magit" "m"))
+  (add-to-list 'project-switch-commands '(sergio/project-magit "Modify .dir-locals.el" "v"))
+  (define-key project-prefix-map (kbd "t") 'sergio/project-vterm)
+  (define-key project-prefix-map (kbd "g") 'sergio/project-magit)
+  (define-key project-prefix-map (kbd "v") 'sergio/modify-dir-locals))
 
 (use-package eglot
   :ensure nil
@@ -243,7 +256,8 @@ If FRAME is omitted or nil, use currently selected frame."
   (set-face-attribute 'eglot-diagnostic-tag-unnecessary-face nil :underline t :slant 'italic)
   (define-key eglot-mode-map (kbd "C-c l r") 'eglot-rename)
   (define-key eglot-mode-map (kbd "C-c l a") 'eglot-code-actions)
-  (define-key eglot-mode-map (kbd "C-c l =") 'eglot-format-buffer))
+  (define-key eglot-mode-map (kbd "C-c l =") 'eglot-format-buffer)
+  (define-key eglot-mode-map (kbd "C-c l e") 'flymake-show-buffer-diagnostics))
 
 (use-package python
   :ensure nil
@@ -354,7 +368,13 @@ If FRAME is omitted or nil, use currently selected frame."
   (require 'ob-sql)
   (org-babel-do-load-languages
    'org-babel-load-languages '((emacs-lisp . t)
-			       (sql . t))))
+							   (sql . t))))
+
+(use-package org-contrib
+  :config
+  (require 'ox-extra)
+  (ox-extras-activate '(latex-header-blocks ignore-headlines)))
+
 (use-package avy
   :bind ("C-c C-SPC" . avy-goto-char))
 
@@ -389,3 +409,48 @@ If FRAME is omitted or nil, use currently selected frame."
 (use-package expand-region
   :bind
   ("C-'" . 'er/expand-region))
+
+(use-package dape
+  :ensure (:tag "0.14.0")
+  ;; :preface
+  ;; By default dape shares the same keybinding prefix as `gud'
+  ;; If you do not want to use any prefix, set it to nil.
+  ;; (setq dape-key-prefix "\C-x\C-a")
+
+  ;; :hook
+  ;; Save breakpoints on quit
+  ;; ((kill-emacs . dape-breakpoint-save)
+  ;; Load breakpoints on startup
+  ;;  (after-init . dape-breakpoint-load))
+
+  ;; :init
+  ;; To use window configuration like gud (gdb-mi)
+  ;; (setq dape-buffer-window-arrangement 'gud)
+
+  :config
+  ;; Info buffers to the right
+  ;; (setq dape-buffer-window-arrangement 'right)
+
+  ;; Global bindings for setting breakpoints with mouse
+  (dape-breakpoint-global-mode)
+
+  ;; Pulse source line (performance hit)
+  ;; (add-hook 'dape-display-source-hook 'pulse-momentary-highlight-one-line)
+
+  ;; To not display info and/or buffers on startup
+  ;; (remove-hook 'dape-start-hook 'dape-info)
+  ;; (remove-hook 'dape-start-hook 'dape-repl)
+
+  ;; To display info and/or repl buffers on stopped
+  ;; (add-hook 'dape-stopped-hook 'dape-info)
+  ;; (add-hook 'dape-stopped-hook 'dape-repl)
+
+  ;; Kill compile buffer on build success
+  ;; (add-hook 'dape-compile-hook 'kill-buffer)
+
+  ;; Save buffers on startup, useful for interpreted languages
+  ;; (add-hook 'dape-start-hook (lambda () (save-some-buffers t t)))
+
+  ;; Projectile users
+  ;; (setq dape-cwd-fn 'projectile-project-root)
+  )
