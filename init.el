@@ -227,7 +227,7 @@ If FRAME is omitted or nil, use currently selected frame."
   (add-to-list 'project-switch-commands '(sergio/project-magit "Magit" "m"))
   (add-to-list 'project-switch-commands '(sergio/project-magit "Modify .dir-locals.el" "v"))
   (define-key project-prefix-map (kbd "t") 'sergio/project-vterm)
-  (define-key project-prefix-map (kbd "g") 'sergio/project-magit)
+  (define-key project-prefix-map (kbd "m") 'sergio/project-magit)
   (define-key project-prefix-map (kbd "v") 'sergio/modify-dir-locals))
 
 (use-package eglot
