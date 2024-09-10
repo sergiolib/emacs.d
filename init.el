@@ -265,9 +265,9 @@ If FRAME is omitted or nil, use currently selected frame."
 (use-package python
   :ensure nil
   :config
-  ;; (defun sergio/format-buffer-on-save ()
-    ;; (add-hook 'before-save-hook 'eglot-format-buffer nil t))
-  ;; (add-hook 'python-base-mode-hook 'sergio/format-buffer-on-save)
+  (defun sergio/format-buffer-on-save ()
+    (add-hook 'before-save-hook 'eglot-format-buffer nil t))
+  (add-hook 'python-base-mode-hook 'sergio/format-buffer-on-save)
   :mode
   ("\\.py\\'" . python-ts-mode))
 
