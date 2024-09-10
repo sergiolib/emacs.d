@@ -46,6 +46,7 @@
   ;; Enable use-package :ensure support for Elpaca.
   (elpaca-use-package-mode))
 
+;;(setq use-package-verbose 1)
 (setq use-package-always-ensure t)
 
 ;;Turns off elpaca-use-package-mode current declaration
@@ -156,9 +157,11 @@ If FRAME is omitted or nil, use currently selected frame."
   :bind
   ("C-c C-s" . consult-line)
   ("C-x b" . consult-buffer)
-  ("C-x ," . consult-recent-file))
+  ("C-x ," . consult-recent-file)
+  ("M-y" . consult-yank-pop))
 
-(use-package embark-consult)
+(use-package embark-consult
+  :after embark)
 
 (use-package orderless
   :ensure (:tag "1.1")
@@ -200,13 +203,11 @@ If FRAME is omitted or nil, use currently selected frame."
   (dired-mode . nerd-icons-dired-mode))
 
 (use-package vterm
-  :config
-  (global-set-key (kbd "<f8>") 'vterm))
+  :bind
+  ("<f8>" . vterm))
 
 (use-package treemacs
-  :config
-  (treemacs)
-  (treemacs-project-follow-mode 1))
+  :commands (treemacs))
 
 (use-package project
   :ensure nil
@@ -232,6 +233,8 @@ If FRAME is omitted or nil, use currently selected frame."
 
 (use-package eglot
   :ensure nil
+  :hook
+  ((python-base-mode terraform-mode) . eglot-ensure)
   :config
   (setq eglot-events-buffer-size 0)
   (setq gc-cons-threshold 1000000000
@@ -262,7 +265,6 @@ If FRAME is omitted or nil, use currently selected frame."
 (use-package python
   :ensure nil
   :config
-  (add-hook 'python-base-mode-hook 'eglot-ensure)
   ;; (defun sergio/format-buffer-on-save ()
     ;; (add-hook 'before-save-hook 'eglot-format-buffer nil t))
   ;; (add-hook 'python-base-mode-hook 'sergio/format-buffer-on-save)
@@ -274,9 +276,7 @@ If FRAME is omitted or nil, use currently selected frame."
   (pyvenv-mode 1)
   (pyvenv-tracking-mode 1))
 
-(use-package terraform-mode
-  :hook
-  (terraform-mode . eglot-ensure))
+(use-package terraform-mode)
 
 (use-package cape
   :config
@@ -297,7 +297,9 @@ If FRAME is omitted or nil, use currently selected frame."
   :config
   (which-key-mode 1))
 
-(use-package dockerfile-mode)
+(use-package dockerfile-mode
+  :mode
+  ("\\Dockerfile\\'"))
 
 (use-package magit
   :ensure (:tag "v3.3.0")
@@ -368,9 +370,10 @@ If FRAME is omitted or nil, use currently selected frame."
   (require 'ob-sql)
   (org-babel-do-load-languages
    'org-babel-load-languages '((emacs-lisp . t)
-							   (sql . t))))
+			       (sql . t))))
 
 (use-package org-contrib
+  :after org
   :config
   (require 'ox-extra)
   (ox-extras-activate '(latex-header-blocks ignore-headlines)))
@@ -389,12 +392,13 @@ If FRAME is omitted or nil, use currently selected frame."
   (tsx-ts-mode . prettier-js-mode))
 
 (use-package docker
+  :bind
+  ("C-c C-d d" . docker)
+  ("C-c C-d c" . docker-compose)
+  ("C-c C-d C-d" . docker)
+  ("C-c C-d C-c" . docker-compose)
   :config
-  (setq docker-compose-command "docker compose")
-  (global-set-key (kbd "C-c C-d d") 'docker)
-  (global-set-key (kbd "C-c C-d C-d") 'docker)
-  (global-set-key (kbd "C-c C-d c") 'docker-compose)
-  (global-set-key (kbd "C-c C-d C-c") 'docker-compose))
+  (setq docker-compose-command "docker compose"))
 
 (use-package rainbow-mode
   :hook
@@ -411,6 +415,7 @@ If FRAME is omitted or nil, use currently selected frame."
   ("C-'" . 'er/expand-region))
 
 (use-package dape
+  :after eglot
   :ensure (:tag "0.14.0")
   ;; :preface
   ;; By default dape shares the same keybinding prefix as `gud'
