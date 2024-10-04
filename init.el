@@ -92,18 +92,6 @@
   (add-hook 'tsx-ts-mode-hook #'(lambda () (setq-local js-indent-level 2)))
   (add-hook 'typescript-ts-mode-hook #'(lambda () (setq-local js-jsx-indent-level 2)))
   (add-hook 'tsx-ts-mode-hook #'(lambda () (setq-local js-jsx-indent-level 2)))
-  (defun my/frame-recenter (&optional frame)
-    "Center FRAME on the screen.
-FRAME can be a frame name, a terminal name, or a frame.
-If FRAME is omitted or nil, use currently selected frame."
-    (interactive)
-    (unless (eq 'maximised (frame-parameter nil 'fullscreen))
-      (modify-frame-parameters
-       frame '((user-position . t) (top . 0.5) (left . 0.5)))))
-  (when (window-system)
-    (set-frame-height (selected-frame) 80)
-    (set-frame-width (selected-frame) 200)
-    (my/frame-recenter))
   (unbind-key (kbd "C-x C-z"))  ;; Unbind suspend frame
   (unbind-key (kbd "C-z"))  ;; Unbind suspend frame
   (global-set-key (kbd "C-c e") 'open-init-file)
@@ -276,6 +264,10 @@ If FRAME is omitted or nil, use currently selected frame."
   (pyvenv-mode 1)
   (pyvenv-tracking-mode 1))
 
+(use-package poetry
+  :config
+  (poetry-tracking-mode 1))
+
 (use-package terraform-mode)
 
 (use-package cape
@@ -370,7 +362,8 @@ If FRAME is omitted or nil, use currently selected frame."
   (require 'ob-sql)
   (org-babel-do-load-languages
    'org-babel-load-languages '((emacs-lisp . t)
-			       (sql . t))))
+			       (sql . t)
+			       (restclient . t))))
 
 (use-package org-contrib
   :after org
@@ -459,3 +452,11 @@ If FRAME is omitted or nil, use currently selected frame."
   ;; Projectile users
   ;; (setq dape-cwd-fn 'projectile-project-root)
   )
+
+(use-package restclient)
+
+(use-package ob-restclient)
+
+(use-package wgrep
+  :init
+  (require 'wgrep))
