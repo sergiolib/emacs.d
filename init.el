@@ -69,6 +69,7 @@
   ;; (load-theme 'modus-operandi)
   (set-face-attribute 'default nil :height 160 :family "JetBrains Mono")
   (auto-save-visited-mode -1)
+  (auto-revert-mode 1)
   (setq calendar-week-start-day 1)
   (recentf-mode 1)
   (global-set-key (kbd "<home>") 'back-to-indentation)
@@ -219,6 +220,11 @@
   (define-key project-prefix-map (kbd "m") 'sergio/project-magit)
   (define-key project-prefix-map (kbd "v") 'sergio/modify-dir-locals))
 
+(use-package ruff-format
+  :hook
+  (python-mode . ruff-format-on-save-mode)
+  (python-ts-mode . ruff-format-on-save-mode))
+
 (use-package eglot
   :ensure nil
   :hook
@@ -228,21 +234,22 @@
   (setq gc-cons-threshold 1000000000
 	read-process-output-max (* 1024 1024))
   (setq-default eglot-workspace-configuration
-                '(:pylsp (:plugins (
-                                    :flake8 (:enabled :json-false)
-                                    :pycodestyle (:enabled :json-false)
-                                    :pyflakes (:enabled :json-false)
-                                    :mccabe (:enabled :json-false)
-                                    :mypy (:enabled :json-false)
-                                    :ruff (:enabled t
-						    :formatEnabled t
-						    :format ["I"]
-						    :lineLength 160
-						    :targetVersion "py311")
-                                    :isort (:enabled t)
-				    :rope_autoimport (:enabled t) ;; (Slow AF)
-                                    )
-                                   :configurationSources ["flake8"])
+                '(
+		  ;; :pylsp (:plugins (
+                  ;;                   :flake8 (:enabled :json-false)
+                  ;;                   :pycodestyle (:enabled :json-false)
+                  ;;                   :pyflakes (:enabled :json-false)
+                  ;;                   :mccabe (:enabled :json-false)
+                  ;;                   :mypy (:enabled :json-false)
+                  ;;                   :ruff (:enabled t
+		  ;; 				    :formatEnabled t
+		  ;; 				    :format ["I"]
+		  ;; 				    :lineLength 160
+		  ;; 				    :targetVersion "py311")
+                  ;;                   :isort (:enabled t)
+		  ;; 		    :rope_autoimport (:enabled t) ;; (Slow AF)
+                  ;;                   )
+                  ;;                  :configurationSources ["flake8"])
                          :terraform-ls (:prefillRequiredFields t)))
   (set-face-attribute 'eglot-diagnostic-tag-unnecessary-face nil :underline t :slant 'italic)
   (define-key eglot-mode-map (kbd "C-c l r") 'eglot-rename)
@@ -252,10 +259,10 @@
 
 (use-package python
   :ensure nil
-  :config
-  (defun sergio/format-buffer-on-save ()
-    (add-hook 'before-save-hook 'eglot-format-buffer nil t))
-  (add-hook 'python-base-mode-hook 'sergio/format-buffer-on-save)
+  ;; :config
+  ;; (defun sergio/format-buffer-on-save ()
+  ;;   (add-hook 'before-save-hook 'eglot-format-buffer nil t))
+  ;; (add-hook 'python-base-mode-hook 'sergio/format-buffer-on-save)
   :mode
   ("\\.py\\'" . python-ts-mode))
 
@@ -305,7 +312,8 @@
 
 (use-package direnv
   :config
-  (direnv-mode 1))
+  (direnv-mode 1)
+  (setq direnv-always-show-summary nil))
 
 (use-package code-cells)
 
@@ -342,6 +350,7 @@
   ("C-c s" . org-store-link)
   :custom
   (org-indent-indentation-per-level 1)
+  (rorg-edit-src-content-indentation 0)
   (org-agenda-files (if (eq system-type 'gnu/linux)
 			(append
 			 (f-files "~/Documents/Notes" #'(lambda (f) (s-ends-with? ".org" f)) t)
@@ -350,9 +359,11 @@
   (org-default-notes-file "~/Insync/sergiolib@gmail.com/Google Drive/CapturedTasks.org")
   :hook
   (org-mode . org-indent-mode)
+  (org-mode . (lambda () (electric-indent-local-mode -1)))
   :config
   (require 'org-tempo)
   (add-to-list 'org-structure-template-alist '("sql" . "src sql"))
+  (add-to-list 'org-structure-template-alist '("rest" . "src restclient"))
   (add-hook
    'org-mode-hook
    (lambda ()
@@ -362,6 +373,7 @@
   (require 'ob-sql)
   (org-babel-do-load-languages
    'org-babel-load-languages '((emacs-lisp . t)
+			       (python . t)
 			       (sql . t)
 			       (restclient . t))))
 
@@ -460,3 +472,5 @@
 (use-package wgrep
   :init
   (require 'wgrep))
+(put 'downcase-region 'disabled nil)
+(put 'upcase-region 'disabled nil)
