@@ -41,23 +41,18 @@
 (add-hook 'after-init-hook #'elpaca-process-queues)
 (elpaca `(,@elpaca-order))
 
-;; Install use-package support
 (elpaca elpaca-use-package
-  ;; Enable use-package :ensure support for Elpaca.
   (elpaca-use-package-mode))
 
 ;;(setq use-package-verbose 1)
 (setq use-package-always-ensure t)
 
-;;Turns off elpaca-use-package-mode current declaration
-;;Note this will cause evaluate the declaration immediately. It is not deferred.
-;;Useful for configuring built-in emacs features.
 (use-package emacs
   :ensure nil
   :config
-  (setq-default cursor-type 'bar)
+  (setq enable-recursive-minibuffers t)
+  (minibuffer-depth-indicate-mode 1)
   (setq tab-width 4)
-  ;;disable splash screen and startup message
   (setq inhibit-startup-message t)
   (setq initial-scratch-message nil)
   (setq ring-bell-function #'ignore)
@@ -65,8 +60,6 @@
   (menu-bar-mode 1)
   (scroll-bar-mode -1)
   (blink-cursor-mode -1)
-  ;; (setq modus-themes-mode-line '(accented borderless 1.0))
-  ;; (load-theme 'modus-operandi)
   (set-face-attribute 'default nil :height 160 :family "JetBrains Mono")
   (auto-save-visited-mode -1)
   (auto-revert-mode 1)
@@ -93,8 +86,8 @@
   (add-hook 'tsx-ts-mode-hook #'(lambda () (setq-local js-indent-level 2)))
   (add-hook 'typescript-ts-mode-hook #'(lambda () (setq-local js-jsx-indent-level 2)))
   (add-hook 'tsx-ts-mode-hook #'(lambda () (setq-local js-jsx-indent-level 2)))
-  (unbind-key (kbd "C-x C-z"))  ;; Unbind suspend frame
-  (unbind-key (kbd "C-z"))  ;; Unbind suspend frame
+  (unbind-key (kbd "C-x C-z"))
+  (unbind-key (kbd "C-z"))
   (global-set-key (kbd "C-c e") 'open-init-file)
   (setq custom-file "~/.emacs.d/custom.el")
   :mode
@@ -155,8 +148,7 @@
 (use-package orderless
   :ensure (:tag "1.1")
   :custom
-  (completion-styles '(orderless basic))
-  (completion-category-overrides '((file (styles basic partial-completion)))))
+  (completion-styles '(orderless basic)))
 
 (use-package corfu
   :ensure (:tag "1.5")
@@ -164,7 +156,7 @@
   (global-corfu-mode 1)
   :custom
   (corfu-auto t)
-  (corfu-auto-prefix 1)
+  (corfu-auto-prefix 3)
   :config
   (corfu-echo-mode 1)
   (corfu-history-mode 1))
@@ -178,7 +170,8 @@
   :ensure (:tag "5.0.0"))
 
 (use-package nerd-icons-corfu
-  :ensure (:tag "v0.3.0")
+  :ensure (:tag "v0.4.2")
+  :after corfu
   :config
   (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
 
@@ -216,6 +209,10 @@
   (add-to-list 'project-switch-commands '(sergio/project-vterm "Vterm" "t"))
   (add-to-list 'project-switch-commands '(sergio/project-magit "Magit" "m"))
   (add-to-list 'project-switch-commands '(sergio/project-magit "Modify .dir-locals.el" "v"))
+  (setq project-switch-commands (seq-filter (lambda (x)
+					      (not (eq (car x)
+						       'project-vc-dir)))
+					    project-switch-commands))
   (define-key project-prefix-map (kbd "t") 'sergio/project-vterm)
   (define-key project-prefix-map (kbd "m") 'sergio/project-magit)
   (define-key project-prefix-map (kbd "v") 'sergio/modify-dir-locals))
@@ -234,23 +231,20 @@
   (setq gc-cons-threshold 1000000000
 	read-process-output-max (* 1024 1024))
   (setq-default eglot-workspace-configuration
-                '(
-		  ;; :pylsp (:plugins (
-                  ;;                   :flake8 (:enabled :json-false)
-                  ;;                   :pycodestyle (:enabled :json-false)
-                  ;;                   :pyflakes (:enabled :json-false)
-                  ;;                   :mccabe (:enabled :json-false)
-                  ;;                   :mypy (:enabled :json-false)
-                  ;;                   :ruff (:enabled t
-		  ;; 				    :formatEnabled t
-		  ;; 				    :format ["I"]
-		  ;; 				    :lineLength 160
-		  ;; 				    :targetVersion "py311")
-                  ;;                   :isort (:enabled t)
-		  ;; 		    :rope_autoimport (:enabled t) ;; (Slow AF)
-                  ;;                   )
-                  ;;                  :configurationSources ["flake8"])
-                         :terraform-ls (:prefillRequiredFields t)))
+		'(:pylsp (:plugins (:flake8 (:enabled :json-false)
+				    :pycodestyle (:enabled :json-false)
+				    :pyflakes (:enabled :json-false)
+				    :mccabe (:enabled :json-false)
+				    :mypy (:enabled :json-false)
+				    :ruff (:enabled t
+					   :formatEnabled t
+					   :format ["I"]
+					   :lineLength 160
+					   :targetVersion "py311")
+				    :isort (:enabled t)
+				    :rope_autoimport (:enabled t))
+				   :configurationSources ["flake8"])
+		  :terraform-ls (:prefillRequiredFields t)))
   (set-face-attribute 'eglot-diagnostic-tag-unnecessary-face nil :underline t :slant 'italic)
   (define-key eglot-mode-map (kbd "C-c l r") 'eglot-rename)
   (define-key eglot-mode-map (kbd "C-c l a") 'eglot-code-actions)
@@ -259,10 +253,6 @@
 
 (use-package python
   :ensure nil
-  ;; :config
-  ;; (defun sergio/format-buffer-on-save ()
-  ;;   (add-hook 'before-save-hook 'eglot-format-buffer nil t))
-  ;; (add-hook 'python-base-mode-hook 'sergio/format-buffer-on-save)
   :mode
   ("\\.py\\'" . python-ts-mode))
 
@@ -273,7 +263,7 @@
 
 (use-package poetry
   :config
-  (poetry-tracking-mode 1))
+  (add-hook 'python-base-mode-hook 'poetry-tracking-mode))
 
 (use-package terraform-mode)
 
@@ -308,7 +298,9 @@
 (use-package yaml-ts-mode
   :ensure nil
   :mode
-  ("\\.yml\\'" . yaml-ts-mode))
+  ("\\.ya?ml\\'" . yaml-ts-mode)
+	:config
+	(add-hook 'yaml-ts-mode-hook (lambda () (setq-local tab-width 2))))
 
 (use-package direnv
   :config
@@ -340,7 +332,9 @@
   ("C-c C-n" . denote-open-or-create)
   ("C-c n" . denote-open-or-create)
   :custom
-  (denote-directory (if (eq system-type 'darwin) "~/Library/CloudStorage/GoogleDrive-sergiolib@gmail.com/My Drive/Notes/" "~/Documents/Notes/")))
+  (denote-directory (if (eq system-type 'darwin)
+			"~/Library/CloudStorage/GoogleDrive-sergiolib@gmail.com/My Drive/Notes/"
+		      "~/Documents/Notes/")))
 
 (use-package org
   :ensure nil
@@ -352,9 +346,8 @@
   (org-indent-indentation-per-level 1)
   (rorg-edit-src-content-indentation 0)
   (org-agenda-files (if (eq system-type 'gnu/linux)
-			(append
-			 (f-files "~/Documents/Notes" #'(lambda (f) (s-ends-with? ".org" f)) t)
-			 '("~/Insync/sergiolib@gmail.com/Google Drive/Agenda.org"))
+			(append (f-files "~/Documents/Notes" #'(lambda (f) (s-ends-with? ".org" f)) t)
+				'("~/Insync/sergiolib@gmail.com/Google Drive/Agenda.org"))
 		      '("~/Documents/agenda.org")))
   (org-default-notes-file "~/Insync/sergiolib@gmail.com/Google Drive/CapturedTasks.org")
   :hook
@@ -364,6 +357,7 @@
   (require 'org-tempo)
   (add-to-list 'org-structure-template-alist '("sql" . "src sql"))
   (add-to-list 'org-structure-template-alist '("rest" . "src restclient"))
+  (add-to-list 'org-structure-template-alist '("sh" . "src bash"))
   (add-hook
    'org-mode-hook
    (lambda ()
@@ -419,52 +413,6 @@
   :bind
   ("C-'" . 'er/expand-region))
 
-(use-package dape
-  :after eglot
-  :ensure (:tag "0.14.0")
-  ;; :preface
-  ;; By default dape shares the same keybinding prefix as `gud'
-  ;; If you do not want to use any prefix, set it to nil.
-  ;; (setq dape-key-prefix "\C-x\C-a")
-
-  ;; :hook
-  ;; Save breakpoints on quit
-  ;; ((kill-emacs . dape-breakpoint-save)
-  ;; Load breakpoints on startup
-  ;;  (after-init . dape-breakpoint-load))
-
-  ;; :init
-  ;; To use window configuration like gud (gdb-mi)
-  ;; (setq dape-buffer-window-arrangement 'gud)
-
-  :config
-  ;; Info buffers to the right
-  ;; (setq dape-buffer-window-arrangement 'right)
-
-  ;; Global bindings for setting breakpoints with mouse
-  (dape-breakpoint-global-mode)
-
-  ;; Pulse source line (performance hit)
-  ;; (add-hook 'dape-display-source-hook 'pulse-momentary-highlight-one-line)
-
-  ;; To not display info and/or buffers on startup
-  ;; (remove-hook 'dape-start-hook 'dape-info)
-  ;; (remove-hook 'dape-start-hook 'dape-repl)
-
-  ;; To display info and/or repl buffers on stopped
-  ;; (add-hook 'dape-stopped-hook 'dape-info)
-  ;; (add-hook 'dape-stopped-hook 'dape-repl)
-
-  ;; Kill compile buffer on build success
-  ;; (add-hook 'dape-compile-hook 'kill-buffer)
-
-  ;; Save buffers on startup, useful for interpreted languages
-  ;; (add-hook 'dape-start-hook (lambda () (save-some-buffers t t)))
-
-  ;; Projectile users
-  ;; (setq dape-cwd-fn 'projectile-project-root)
-  )
-
 (use-package restclient)
 
 (use-package ob-restclient)
@@ -474,3 +422,11 @@
   (require 'wgrep))
 (put 'downcase-region 'disabled nil)
 (put 'upcase-region 'disabled nil)
+
+(use-package multiple-cursors
+  :bind
+  ("C->" . mc/mark-next-like-this)
+  ("C-<" . mc/mark-previous-like-this))
+
+(use-package protobuf-ts-mode
+  :mode "\\.proto\\'")
