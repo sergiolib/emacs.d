@@ -68,6 +68,7 @@
   ;; (setq modus-themes-mode-line '(accented borderless 1.0))
   ;; (load-theme 'modus-operandi)
   (set-face-attribute 'default nil :height 160 :family "JetBrains Mono")
+  (when (not (display-graphic-p)) (xterm-mouse-mode 1))
   (auto-save-visited-mode -1)
   (auto-revert-mode 1)
   (setq calendar-week-start-day 1)
