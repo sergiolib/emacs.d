@@ -23,3 +23,7 @@ recentf
 transient/
 var/
 eln-cache/
+custom.el
+network-security.data
+tree-sitter/
+url/
