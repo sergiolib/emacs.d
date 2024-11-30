@@ -441,10 +441,10 @@
 (put 'downcase-region 'disabled nil)
 (put 'upcase-region 'disabled nil)
 
-(use-package multiple-cursors
-  :bind
-  ("C->" . mc/mark-next-like-this)
-  ("C-<" . mc/mark-previous-like-this))
+;; (use-package multiple-cursors
+;;   :bind
+;;   ("C->" . mc/mark-next-like-this)
+;;   ("C-<" . mc/mark-previous-like-this))
 
 (use-package protobuf-ts-mode
   :mode "\\.proto\\'")
@@ -463,3 +463,18 @@
     "p" '(:keymap project-prefix-map :package project)))
 
 (use-package docker-compose-mode)
+
+(use-package evil-multiedit
+  :config
+  (evil-multiedit-default-keybinds)
+  (evil-define-key '(insert normal visual) evil-multiedit-mode-map (kbd "RET") nil)
+  (evil-define-key '(insert normal visual) evil-multiedit-mode-map (kbd "C-c d") 'evil-multiedit-toggle-or-restrict-region))
+
+(use-package evil-nerd-commenter
+  :config
+  (evilnc-default-hotkeys))
+
+(use-package helpful
+  :bind
+  ("C-h v" . helpful-variable)
+  ("C-h f" . helpful-function))
