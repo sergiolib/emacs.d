@@ -1,8 +1,17 @@
 (setq backup-directory-alist `(("." . "~/.saves")))
 (when (eq system-type 'darwin)
   (setq mac-right-option-modifier 'none))
+(when (eq system-type 'gnu/linux)
+  (setenv "PATH" (concat
+		  "/home/sliberman/.local/bin/:"
+		  "/home/sliberman/.pyenv/bin/:"
+		  "/home/sliberman/.pyenv/versions/3.12.7/bin/:"
+		  (getenv "PATH"))))
+(add-to-list 'exec-path "/home/sliberman/.local/bin/")
 
-(defvar elpaca-installer-version 0.7)
+;; Elpaca Installer -*- lexical-binding: t; -*-
+;; Copy below this line into your init.el
+(defvar elpaca-installer-version 0.8)
 (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
 (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
 (defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
@@ -19,18 +28,18 @@
     (make-directory repo t)
     (when (< emacs-major-version 28) (require 'subr-x))
     (condition-case-unless-debug err
-        (if-let ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
-                 ((zerop (apply #'call-process `("git" nil ,buffer t "clone"
-                                                 ,@(when-let ((depth (plist-get order :depth)))
-                                                     (list (format "--depth=%d" depth) "--no-single-branch"))
-                                                 ,(plist-get order :repo) ,repo))))
-                 ((zerop (call-process "git" nil buffer t "checkout"
-                                       (or (plist-get order :ref) "--"))))
-                 (emacs (concat invocation-directory invocation-name))
-                 ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
-                                       "--eval" "(byte-recompile-directory \".\" 0 'force)")))
-                 ((require 'elpaca))
-                 ((elpaca-generate-autoloads "elpaca" repo)))
+        (if-let* ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
+                  ((zerop (apply #'call-process `("git" nil ,buffer t "clone"
+                                                  ,@(when-let* ((depth (plist-get order :depth)))
+                                                      (list (format "--depth=%d" depth) "--no-single-branch"))
+                                                  ,(plist-get order :repo) ,repo))))
+                  ((zerop (call-process "git" nil buffer t "checkout"
+                                        (or (plist-get order :ref) "--"))))
+                  (emacs (concat invocation-directory invocation-name))
+                  ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
+                                        "--eval" "(byte-recompile-directory \".\" 0 'force)")))
+                  ((require 'elpaca))
+                  ((elpaca-generate-autoloads "elpaca" repo)))
             (progn (message "%s" (buffer-string)) (kill-buffer buffer))
           (error "%s" (with-current-buffer buffer (buffer-string))))
       ((error) (warn "%s" err) (delete-directory repo 'recursive))))
@@ -60,7 +69,7 @@
   (menu-bar-mode 1)
   (scroll-bar-mode -1)
   (blink-cursor-mode -1)
-  (set-face-attribute 'default nil :height 160 :family "JetBrains Mono")
+  (set-face-attribute 'default nil :height 120 :family "JetBrains Mono")
   (when (not (display-graphic-p)) (xterm-mouse-mode 1))
   (auto-save-visited-mode -1)
   (auto-revert-mode 1)
@@ -74,6 +83,10 @@
   (setq display-line-numbers-type 'relative
 	display-line-numbers-widen t)
   (global-display-line-numbers-mode 1)
+  (setq excluded-hooks-from-display-numbers '(doc-view-mode-hook))
+  (mapc (lambda (hook) (add-hook hook
+				 #'(lambda () (display-line-numbers-mode 0))))
+	excluded-hooks-from-display-numbers)
   (let ((no-line-number-hooks '(vterm-mode-hook help-mode-hook)))
     (dolist (hook no-line-number-hooks)
       (add-hook hook #'(lambda () (display-line-numbers-mode -1)))))
@@ -81,8 +94,8 @@
   (winner-mode 1)
   (add-hook 'compilation-filter-hook 'ansi-color-compilation-filter)
   (add-hook 'compilation-filter-hook 'ansi-osc-compilation-filter)
-  (add-hook 'tsx-ts-mode-hook 'eglot-ensure)
-  (add-hook 'typescript-ts-mode-hook 'eglot-ensure)
+  (add-hook 'tsx-ts-mode-hook 'eglot-ensure 100)
+  (add-hook 'typescript-ts-mode-hook 'eglot-ensure 100)
   (add-hook 'typescript-ts-mode-hook #'(lambda () (setq-local js-indent-level 2)))
   (add-hook 'tsx-ts-mode-hook #'(lambda () (setq-local js-indent-level 2)))
   (add-hook 'typescript-ts-mode-hook #'(lambda () (setq-local js-jsx-indent-level 2)))
@@ -99,7 +112,8 @@
     "Open the init file"
     (interactive)
     (find-file "~/.emacs.d/init.el"))
-  (setenv "PATH" (concat "/Library/TeX/texbin/:" (getenv "PATH"))))
+  (when (eq system-type 'gnu/linux)
+    (setenv "PATH" (concat "/Library/TeX/texbin/:" (getenv "PATH")))))
 
 (use-package ef-themes
   :config
@@ -224,10 +238,11 @@
   (python-ts-mode . ruff-format-on-save-mode))
 
 (use-package eglot
+  :commands (eglot eglot-ensure)
   :ensure nil
-  :hook
-  ((python-base-mode terraform-mode) . eglot-ensure)
   :config
+  (add-hook 'python-base-mode-hook 'eglot-ensure 100)
+  (add-hook 'terraform-mode-hook 'eglot-ensure 100)
   (setq eglot-events-buffer-size 0)
   (setq gc-cons-threshold 1000000000
 	read-process-output-max (* 1024 1024))
@@ -256,15 +271,17 @@
   :ensure nil
   :mode
   ("\\.py\\'" . python-ts-mode))
+(defun sergio/add-pyright-venv-info ()
+  (setq eglot-workspace-configuration '(:pyright (:venv ".venv" :venvPath (f-parent poetry-project-venv)))))
 
 (use-package pyvenv
   :config
   (pyvenv-mode 1)
-  (pyvenv-tracking-mode 1))
+  (add-hook 'pyvenv-post-activate-hooks 'sergio/add-pyright-venv-info))
 
 (use-package poetry
   :config
-  (add-hook 'python-base-mode-hook 'poetry-tracking-mode))
+  (add-hook 'python-base-mode-hook 'poetry-tracking-mode 10))
 
 (use-package terraform-mode)
 
@@ -397,7 +414,7 @@
   ("C-c C-d c" . docker-compose)
   ("C-c C-d C-d" . docker)
   ("C-c C-d C-c" . docker-compose)
-  :config
+  :init
   (setq docker-compose-command "docker compose"))
 
 (use-package rainbow-mode
@@ -431,3 +448,18 @@
 
 (use-package protobuf-ts-mode
   :mode "\\.proto\\'")
+
+(use-package evil
+  :config
+  (turn-on-evil-mode))
+
+(use-package general
+  :config
+  (general-create-definer leader
+    :keymaps '(normal insert visual emacs)
+    :prefix "SPC"
+    :global-prefix "C-SPC")
+  (leader
+    "p" '(:keymap project-prefix-map :package project)))
+
+(use-package docker-compose-mode)
