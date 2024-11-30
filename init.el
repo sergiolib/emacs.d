@@ -451,7 +451,13 @@
 
 (use-package evil
   :config
-  (evil-mode 1))
+  (evil-mode 1)
+  :custom
+  (evil-undo-system 'undo-redo))
+
+(use-package evil-collection
+  :config
+  (evil-collection-setup))
 
 (use-package general
   :config
