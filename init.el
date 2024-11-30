@@ -451,7 +451,7 @@
 
 (use-package evil
   :config
-  (turn-on-evil-mode))
+  (evil-mode 1))
 
 (use-package general
   :config
