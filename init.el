@@ -152,7 +152,7 @@
 (use-package consult
   :ensure (:tag "1.8")  
   :bind
-  ("C-c C-s" . consult-line)
+  ("C-s" . consult-line)
   ("C-x b" . consult-buffer)
   ("C-x ," . consult-recent-file)
   ("M-y" . consult-yank-pop))
@@ -248,19 +248,19 @@
 	read-process-output-max (* 1024 1024))
   (setq-default eglot-workspace-configuration
 		'(:pylsp (:plugins (:flake8 (:enabled :json-false)
-				    :pycodestyle (:enabled :json-false)
-				    :pyflakes (:enabled :json-false)
-				    :mccabe (:enabled :json-false)
-				    :mypy (:enabled :json-false)
-				    :ruff (:enabled t
-					   :formatEnabled t
-					   :format ["I"]
-					   :lineLength 160
-					   :targetVersion "py311")
-				    :isort (:enabled t)
-				    :rope_autoimport (:enabled t))
+					    :pycodestyle (:enabled :json-false)
+					    :pyflakes (:enabled :json-false)
+					    :mccabe (:enabled :json-false)
+					    :mypy (:enabled :json-false)
+					    :ruff (:enabled t
+							    :formatEnabled t
+							    :format ["I"]
+							    :lineLength 160
+							    :targetVersion "py311")
+					    :isort (:enabled t)
+					    :rope_autoimport (:enabled t))
 				   :configurationSources ["flake8"])
-		  :terraform-ls (:prefillRequiredFields t)))
+			 :terraform-ls (:prefillRequiredFields t)))
   (set-face-attribute 'eglot-diagnostic-tag-unnecessary-face nil :underline t :slant 'italic)
   (define-key eglot-mode-map (kbd "C-c l r") 'eglot-rename)
   (define-key eglot-mode-map (kbd "C-c l a") 'eglot-code-actions)
@@ -317,8 +317,8 @@
   :ensure nil
   :mode
   ("\\.ya?ml\\'" . yaml-ts-mode)
-	:config
-	(add-hook 'yaml-ts-mode-hook (lambda () (setq-local tab-width 2))))
+  :config
+  (add-hook 'yaml-ts-mode-hook (lambda () (setq-local tab-width 2))))
 
 (use-package direnv
   :config
@@ -480,7 +480,15 @@
   :config
   (evilnc-default-hotkeys))
 
+(use-package evil-surround
+  :config
+  (global-evil-surround-mode 1))
+
 (use-package helpful
   :bind
   ("C-h v" . helpful-variable)
   ("C-h f" . helpful-function))
+
+(use-package apheleia
+  :config
+  (apheleia-global-mode 1))
