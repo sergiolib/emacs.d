@@ -3,10 +3,10 @@
   (setq mac-right-option-modifier 'none))
 (when (eq system-type 'gnu/linux)
   (setenv "PATH" (concat
-		  "/home/sliberman/.local/bin/:"
-		  "/home/sliberman/.pyenv/bin/:"
-		  "/home/sliberman/.pyenv/versions/3.12.7/bin/:"
-		  (getenv "PATH"))))
+				  "/home/sliberman/.local/bin/:"
+				  "/home/sliberman/.pyenv/bin/:"
+				  "/home/sliberman/.pyenv/versions/3.12.7/bin/:"
+				  (getenv "PATH"))))
 (add-to-list 'exec-path "/home/sliberman/.local/bin/")
 
 ;; Elpaca Installer -*- lexical-binding: t; -*-
@@ -62,6 +62,7 @@
   (setq enable-recursive-minibuffers t)
   (minibuffer-depth-indicate-mode 1)
   (setq tab-width 4)
+  (add-hook 'typescript-ts-base-mode-hook #'(lambda () (setq tab-width 2)))
   (setq inhibit-startup-message t)
   (setq initial-scratch-message nil)
   (setq ring-bell-function #'ignore)
@@ -81,12 +82,12 @@
   (setq tab-always-indent 'complete)
   (electric-pair-mode t)
   (setq display-line-numbers-type 'relative
-	display-line-numbers-widen t)
+		display-line-numbers-widen t)
   (global-display-line-numbers-mode 1)
   (setq excluded-hooks-from-display-numbers '(doc-view-mode-hook))
   (mapc (lambda (hook) (add-hook hook
-				 #'(lambda () (display-line-numbers-mode 0))))
-	excluded-hooks-from-display-numbers)
+								 #'(lambda () (display-line-numbers-mode 0))))
+		excluded-hooks-from-display-numbers)
   (let ((no-line-number-hooks '(vterm-mode-hook help-mode-hook)))
     (dolist (hook no-line-number-hooks)
       (add-hook hook #'(lambda () (display-line-numbers-mode -1)))))
@@ -225,9 +226,9 @@
   (add-to-list 'project-switch-commands '(sergio/project-magit "Magit" "m"))
   (add-to-list 'project-switch-commands '(sergio/project-magit "Modify .dir-locals.el" "v"))
   (setq project-switch-commands (seq-filter (lambda (x)
-					      (not (eq (car x)
-						       'project-vc-dir)))
-					    project-switch-commands))
+											  (not (eq (car x)
+													   'project-vc-dir)))
+											project-switch-commands))
   (define-key project-prefix-map (kbd "t") 'sergio/project-vterm)
   (define-key project-prefix-map (kbd "m") 'sergio/project-magit)
   (define-key project-prefix-map (kbd "v") 'sergio/modify-dir-locals))
@@ -245,22 +246,22 @@
   (add-hook 'terraform-mode-hook 'eglot-ensure 100)
   (setq eglot-events-buffer-size 0)
   (setq gc-cons-threshold 1000000000
-	read-process-output-max (* 1024 1024))
+		read-process-output-max (* 1024 1024))
   (setq-default eglot-workspace-configuration
-		'(:pylsp (:plugins (:flake8 (:enabled :json-false)
-					    :pycodestyle (:enabled :json-false)
-					    :pyflakes (:enabled :json-false)
-					    :mccabe (:enabled :json-false)
-					    :mypy (:enabled :json-false)
-					    :ruff (:enabled t
-							    :formatEnabled t
-							    :format ["I"]
-							    :lineLength 160
-							    :targetVersion "py311")
-					    :isort (:enabled t)
-					    :rope_autoimport (:enabled t))
-				   :configurationSources ["flake8"])
-			 :terraform-ls (:prefillRequiredFields t)))
+				'(:pylsp (:plugins (:flake8 (:enabled :json-false)
+											:pycodestyle (:enabled :json-false)
+											:pyflakes (:enabled :json-false)
+											:mccabe (:enabled :json-false)
+											:mypy (:enabled :json-false)
+											:ruff (:enabled t
+															:formatEnabled t
+															:format ["I"]
+															:lineLength 160
+															:targetVersion "py311")
+											:isort (:enabled t)
+											:rope_autoimport (:enabled t))
+								   :configurationSources ["flake8"])
+						 :terraform-ls (:prefillRequiredFields t)))
   (set-face-attribute 'eglot-diagnostic-tag-unnecessary-face nil :underline t :slant 'italic)
   (define-key eglot-mode-map (kbd "C-c l r") 'eglot-rename)
   (define-key eglot-mode-map (kbd "C-c l a") 'eglot-code-actions)
@@ -351,8 +352,8 @@
   ("C-c n" . denote-open-or-create)
   :custom
   (denote-directory (if (eq system-type 'darwin)
-			"~/Library/CloudStorage/GoogleDrive-sergiolib@gmail.com/My Drive/Notes/"
-		      "~/Documents/Notes/")))
+						"~/Library/CloudStorage/GoogleDrive-sergiolib@gmail.com/My Drive/Notes/"
+					  "~/Documents/Notes/")))
 
 (use-package org
   :ensure nil
@@ -364,9 +365,9 @@
   (org-indent-indentation-per-level 1)
   (rorg-edit-src-content-indentation 0)
   (org-agenda-files (if (eq system-type 'gnu/linux)
-			(append (f-files "~/Documents/Notes" #'(lambda (f) (s-ends-with? ".org" f)) t)
-				'("~/Insync/sergiolib@gmail.com/Google Drive/Agenda.org"))
-		      '("~/Documents/agenda.org")))
+						(append (f-files "~/Documents/Notes" #'(lambda (f) (s-ends-with? ".org" f)) t)
+								'("~/Insync/sergiolib@gmail.com/Google Drive/Agenda.org"))
+					  '("~/Documents/agenda.org")))
   (org-default-notes-file "~/Insync/sergiolib@gmail.com/Google Drive/CapturedTasks.org")
   :hook
   (org-mode . org-indent-mode)
@@ -380,14 +381,14 @@
    'org-mode-hook
    (lambda ()
      (setq-local electric-pair-inhibit-predicate
-		 `(lambda (c)
+				 `(lambda (c)
                     (if (char-equal c ?<) t (,electric-pair-inhibit-predicate c))))))
   (require 'ob-sql)
   (org-babel-do-load-languages
    'org-babel-load-languages '((emacs-lisp . t)
-			       (python . t)
-			       (sql . t)
-			       (restclient . t))))
+							   (python . t)
+							   (sql . t)
+							   (restclient . t))))
 
 (use-package org-contrib
   :after org
@@ -452,8 +453,10 @@
 (use-package evil
   :config
   (evil-mode 1)
+  (global-set-key (kbd "C-M-u") 'universal-argument)
   :custom
-  (evil-undo-system 'undo-redo))
+  (evil-undo-system 'undo-redo)
+  (evil-want-C-u-scroll t))
 
 (use-package evil-collection
   :config
