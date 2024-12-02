@@ -98,14 +98,13 @@
   (add-hook 'compilation-filter-hook 'ansi-osc-compilation-filter)
   (add-hook 'tsx-ts-mode-hook 'eglot-ensure 100)
   (add-hook 'typescript-ts-mode-hook 'eglot-ensure 100)
-  (add-hook 'python-base-mode-hook 'eglot-ensure 100)
   (add-hook 'typescript-ts-mode-hook #'(lambda () (setq-local js-indent-level 2)))
   (add-hook 'tsx-ts-mode-hook #'(lambda () (setq-local js-indent-level 2)))
   (add-hook 'typescript-ts-mode-hook #'(lambda () (setq-local js-jsx-indent-level 2)))
   (add-hook 'tsx-ts-mode-hook #'(lambda () (setq-local js-jsx-indent-level 2)))
   (unbind-key (kbd "C-x C-z"))
   (unbind-key (kbd "C-z"))
-  ;; (global-set-key (kbd "C-c e") 'open-init-file)
+  (global-set-key (kbd "C-c e") 'open-init-file)
   (setq custom-file "~/.emacs.d/custom.el")
   :mode
   ("\\.tsx\\'" . tsx-ts-mode)
@@ -192,7 +191,7 @@
   )
 
 (use-package all-the-icons
-  :ensure (:tag "5.0.0"))jk
+  :ensure (:tag "5.0.0"))
 
 (use-package nerd-icons-corfu
   :ensure (:tag "v0.4.2")
@@ -248,29 +247,13 @@
   (python-ts-mode . ruff-format-on-save-mode))
 
 (use-package eglot
-  :commands (eglot eglot-ensure)
   :ensure nil
   :config
   (add-hook 'python-base-mode-hook 'eglot-ensure 100)
   (add-hook 'terraform-mode-hook 'eglot-ensure 100)
-  (setq eglot-events-buffer-size 0)
+  (setq eglot-events-buffer-size 2000000)
   (setq gc-cons-threshold 1000000000
 	read-process-output-max (* 1024 1024))
-  (setq-default eglot-workspace-configuration
-		'(:pylsp (:plugins (:flake8 (:enabled :json-false)
-					    :pycodestyle (:enabled :json-false)
-					    :pyflakes (:enabled :json-false)
-					    :mccabe (:enabled :json-false)
-					    :mypy (:enabled :json-false)
-					    :ruff (:enabled t
-							    :formatEnabled t
-							    :format ["I"]
-							    :lineLength 160
-							    :targetVersion "py311")
-					    :isort (:enabled t)
-					    :rope_autoimport (:enabled t))
-				   :configurationSources ["flake8"])
-			 :terraform-ls (:prefillRequiredFields t)))
   (set-face-attribute 'eglot-diagnostic-tag-unnecessary-face nil :underline t :slant 'italic)
   (define-key eglot-mode-map (kbd "C-c l r") 'eglot-rename)
   (define-key eglot-mode-map (kbd "C-c l a") 'eglot-code-actions)
@@ -281,13 +264,11 @@
   :ensure nil
   :mode
   ("\\.py\\'" . python-ts-mode))
-(defun sergio/add-pyright-venv-info ()
-  (setq eglot-workspace-configuration '(:pyright (:venv ".venv" :venvPath (f-parent poetry-project-venv)))))
+
 
 (use-package pyvenv
   :config
-  (pyvenv-mode 1)
-  (add-hook 'pyvenv-post-activate-hooks 'sergio/add-pyright-venv-info))
+  (pyvenv-mode 1))
 
 (use-package poetry
   :config
@@ -483,7 +464,7 @@
   (leader
     "p" '(:keymap project-prefix-map :package project)
     "e" '(:ignore t :which-key "Emacs")
-    "ee" #'(lambda () (interactive) (find-file user-init-file))
+    "ee" '((lambda () (interactive) (find-file user-init-file)) :which-key "Visit init file")
     "b" '(:ignore t :which-key "Buffers")
     "bb" 'consult-buffer
     "," 'consult-recent-file))
