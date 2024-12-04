@@ -70,7 +70,7 @@
   (when (eq system-type 'darwin)
     (menu-bar-mode 1))
   (scroll-bar-mode -1)
-  (blink-cursor-mode -1)
+  (blink-cursor-mode 1)
   (when (eq system-type 'gnu/linux)
     (set-face-attribute 'default nil :height 110 :family "JetBrains Mono"))
   (when (eq system-type 'darwin)
@@ -180,7 +180,8 @@
   (corfu-popupinfo-mode 1)
   :config
   (corfu-echo-mode 1)
-  (corfu-history-mode 1))
+  (corfu-history-mode 1)
+  (define-key corfu-map (kbd "TAB") 'corfu-insert))
 
 (use-package doom-modeline
   :ensure (:tag "v4.1.0")
@@ -255,13 +256,19 @@
   (add-hook 'python-base-mode-hook 'eglot-ensure 100)
   (add-hook 'terraform-mode-hook 'eglot-ensure 100)
   (setq eglot-events-buffer-size 2000000)
-  (setq gc-cons-threshold 1000000000
+  (fset #'jsonrpc--log-event #'ignore)
+  (setq gc-cons-threshold 800000
 	read-process-output-max (* 1024 1024))
   (set-face-attribute 'eglot-diagnostic-tag-unnecessary-face nil :underline t :slant 'italic)
   (define-key eglot-mode-map (kbd "C-c l r") 'eglot-rename)
   (define-key eglot-mode-map (kbd "C-c l a") 'eglot-code-actions)
   (define-key eglot-mode-map (kbd "C-c l =") 'eglot-format-buffer)
   (define-key eglot-mode-map (kbd "C-c l e") 'flymake-show-buffer-diagnostics))
+
+(use-package eglot-booster
+  :ensure (:host github :repo "jdtsmith/eglot-booster")
+  :after eglot
+  :config	(eglot-booster-mode))
 
 (use-package python
   :ensure nil
@@ -281,6 +288,7 @@
 
 (use-package cape
   :config
+  (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
   (defun add-cape-file-to-python-capfs ()
     (add-hook 'completion-at-point-functions #'cape-file nil t)
     (remove-hook 'completion-at-point-functions 'python-completion-at-point t)
