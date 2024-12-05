@@ -313,7 +313,9 @@
 (use-package magit
   :ensure (:tag "v3.3.0")
   :bind
-  ("C-c g" . magit-status))
+  ("C-c g" . magit-status)
+  :custom
+  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 
 (use-package yaml-ts-mode
   :ensure nil
@@ -339,9 +341,7 @@
   :config
   (global-git-gutter-mode 1))
 
-(use-package yasnippet
-  :config
-  (yas-global-mode 1))
+;; (use-package yasnippet)
 
 (use-package json-mode
   :mode
@@ -457,6 +457,7 @@
   :config
   (evil-mode 1)
   (global-set-key (kbd "C-M-u") 'universal-argument)
+  (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
   :custom
   (evil-undo-system 'undo-redo)
   (evil-want-C-u-scroll t))
@@ -489,8 +490,8 @@
   (evil-define-key '(insert normal visual) evil-multiedit-mode-map (kbd "C-c d") 'evil-multiedit-toggle-or-restrict-region))
 
 (use-package evil-nerd-commenter
-  :config
-  (evilnc-default-hotkeys))
+  :bind
+  ("M-;" . evilnc-comment-or-uncomment-lines))
 
 (use-package evil-surround
   :config
