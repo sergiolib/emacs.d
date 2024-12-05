@@ -218,10 +218,15 @@
   :bind
   ("<f8>" . vterm-toggle)
   :config
-  (setq vterm-toggle-scope t)
-  (define-key vterm-mode-map (kbd "<f8>") 'vterm-toggle))
+  (setq vterm-toggle-scope 'project)
+  (define-key vterm-mode-map (kbd "<f8>") 'vterm-toggle)
+  (add-to-list 'display-buffer-alist
+               '("\\*vterm\\*"
+		 (display-buffer-reuse-window
+                  display-buffer-at-bottom)
+		 (window-height . 0.3))))
 
-(Use-package treemacs
+(use-package treemacs
 	     :commands (treemacs))
 
 (use-package project
