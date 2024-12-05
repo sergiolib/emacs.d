@@ -416,10 +416,6 @@
   (add-hook 'tsx-ts-mode-hook #'editorconfig-apply)
   :hook (tsx-ts-mode . editorconfig-mode))
 
-(use-package prettier-js
-  :hook
-  (tsx-ts-mode . prettier-js-mode))
-
 (use-package docker
   :bind
   ("C-c C-d d" . docker)
@@ -514,4 +510,5 @@
 
 (use-package apheleia
   :config
-  (apheleia-global-mode 1))
+  (apheleia-global-mode 1)
+  (setq apheleia-formatters-respect-indent-level nil))
