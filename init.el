@@ -212,12 +212,17 @@
   :hook
   (dired-mode . nerd-icons-dired-mode))
 
-(use-package vterm
-  :bind
-  ("<f8>" . vterm))
+(use-package vterm)
 
-(use-package treemacs
-  :commands (treemacs))
+(use-package vterm-toggle
+  :bind
+  ("<f8>" . vterm-toggle)
+  :config
+  (setq vterm-toggle-scope t)
+  (define-key vterm-mode-map (kbd "<f8>") 'vterm-toggle))
+
+(Use-package treemacs
+	     :commands (treemacs))
 
 (use-package project
   :ensure nil
