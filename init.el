@@ -109,7 +109,9 @@
   (unbind-key (kbd "C-z"))
   (global-set-key (kbd "C-c e") 'open-init-file)
   (setq custom-file "~/.emacs.d/custom.el")
-  (setq completion-ignore-case t)
+  (setq completion-ignore-case t
+	read-file-name-completion-ignore-case t
+	read-buffer-completion-ignore-case t)
   :mode
   ("\\.tsx\\'" . tsx-ts-mode)
   ("\\.ts\\'" . typescript-ts-mode)
