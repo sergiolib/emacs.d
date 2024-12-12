@@ -217,17 +217,12 @@
 (use-package vterm)
 
 (use-package vterm-toggle
-  :after vterm
   :bind
   ("<f8>" . vterm-toggle)
   :config
   (setq vterm-toggle-scope 'project)
-  (define-key vterm-mode-map (kbd "<f8>") 'vterm-toggle)
-  (add-to-list 'display-buffer-alist
-               '("\\*vterm\\*"
-		 (display-buffer-reuse-window
-                  display-buffer-at-bottom)
-		 (window-height . 0.3))))
+  (add-hook 'vterm-toggle-show-hook #'(lambda () (define-key vterm-mode-map (kbd "<f8>") 'vterm-toggle)))
+  (add-to-list 'display-buffer-alist '("\\*vterm\\*" (display-buffer-reuse-window display-buffer-at-bottom) (window-height . 0.3))))
 
 (use-package treemacs
   :commands (treemacs))
@@ -397,6 +392,7 @@
   (add-to-list 'org-structure-template-alist '("sql" . "src sql"))
   (add-to-list 'org-structure-template-alist '("rest" . "src restclient"))
   (add-to-list 'org-structure-template-alist '("sh" . "src bash"))
+  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
   (add-hook
    'org-mode-hook
    (lambda ()
@@ -407,6 +403,7 @@
   (org-babel-do-load-languages
    'org-babel-load-languages '((emacs-lisp . t)
 			       (python . t)
+			       (shell . t)
 			       (sql . t)
 			       (restclient . t))))
 
