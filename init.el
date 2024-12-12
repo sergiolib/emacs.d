@@ -99,8 +99,6 @@
   (winner-mode 1)
   (add-hook 'compilation-filter-hook 'ansi-color-compilation-filter)
   (add-hook 'compilation-filter-hook 'ansi-osc-compilation-filter)
-  (add-hook 'tsx-ts-mode-hook 'eglot-ensure 100)
-  (add-hook 'typescript-ts-mode-hook 'eglot-ensure 100)
   (add-hook 'typescript-ts-mode-hook #'(lambda () (setq-local js-indent-level 2)))
   (add-hook 'tsx-ts-mode-hook #'(lambda () (setq-local js-indent-level 2)))
   (add-hook 'typescript-ts-mode-hook #'(lambda () (setq-local js-jsx-indent-level 2)))
@@ -140,7 +138,7 @@
 (use-package vertico-repeat
   :after vertico
   :ensure nil
-  :bind	      ("C-c r" . 'vertico-repeat))
+  :bind	("C-c r" . 'vertico-repeat))
 
 (use-package marginalia
   :ensure (:tag "1.7")
@@ -204,6 +202,7 @@
   (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
 
 (use-package dired
+  :commands (dired)
   :ensure nil
   :config
   (add-hook 'dired-mode-hook 'dired-hide-details-mode))
@@ -212,7 +211,8 @@
   :hook
   (dired-mode . nerd-icons-dired-mode))
 
-(use-package vterm)
+(use-package vterm
+  :commands (vterm vterm-toggle))
 
 (use-package vterm-toggle
   :bind
@@ -227,7 +227,7 @@
 		 (window-height . 0.3))))
 
 (use-package treemacs
-	     :commands (treemacs))
+  :commands (treemacs))
 
 (use-package project
   :ensure nil
@@ -262,10 +262,14 @@
 
 (use-package eglot
   :ensure nil
-  :config
+  :commands (eglot eglot-ensure)
+  :init
   (add-hook 'python-base-mode-hook 'eglot-ensure 100)
   (add-hook 'terraform-mode-hook 'eglot-ensure 100)
-  (setq eglot-events-buffer-size 2000000)
+  (add-hook 'tsx-ts-mode-hook 'eglot-ensure 100)
+  (add-hook 'typescript-ts-mode-hook 'eglot-ensure 100)
+  :config
+  (setq eglot-events-buffer-size 0)
   (fset #'jsonrpc--log-event #'ignore)
   (setq gc-cons-threshold 800000
 	read-process-output-max (* 1024 1024))
@@ -276,25 +280,28 @@
   (define-key eglot-mode-map (kbd "C-c l e") 'flymake-show-buffer-diagnostics))
 
 (use-package eglot-booster
-  :ensure (:host github :repo "jdtsmith/eglot-booster")
   :after eglot
-  :config	(eglot-booster-mode))
+  :ensure (:host github :repo "jdtsmith/eglot-booster")
+  :config (eglot-booster-mode))
 
 (use-package python
   :ensure nil
+  :config
+  (add-hook 'python-base-mode-hook 'pyvenv-mode)
+  (add-hook 'python-base-mode-hook 'poetry-tracking-mode 10)
   :mode
   ("\\.py\\'" . python-ts-mode))
 
 
 (use-package pyvenv
-  :config
-  (pyvenv-mode 1))
+  :commands (pyvenv-mode)
+  )
 
 (use-package poetry
-  :config
-  (add-hook 'python-base-mode-hook 'poetry-tracking-mode 10))
+  :commands (poetry-tracking-mode poetry))
 
-(use-package terraform-mode)
+(use-package terraform-mode
+  :mode "\\.tf\\'")
 
 (use-package cape
   :config
@@ -339,13 +346,12 @@
   (direnv-mode 1)
   (setq direnv-always-show-summary nil))
 
-(use-package code-cells)
+(use-package code-cells
+  :commands (code-cells-mode))
 
 (use-package move-text
   :config
   (move-text-default-bindings))
-
-(use-package iedit)
 
 (use-package git-gutter
   :config
@@ -378,7 +384,7 @@
   (org-agenda-files (if (eq system-type 'gnu/linux)
 			(append (f-files "~/Documents/Notes" #'(lambda (f) (s-ends-with? ".org" f)) t)
 				'("~/Insync/sergiolib@gmail.com/Google Drive/Agenda.org"))
-		      '("~/Documents/agenda.org")))
+		      (append '("~/Documents/agenda.org") (f-files "/Users/sliberman/Library/CloudStorage/GoogleDrive-sergiolib@gmail.com/My Drive/Notes/" #'(lambda (f) (s-ends-with? ".org" f)) t))))
   (org-default-notes-file "~/Insync/sergiolib@gmail.com/Google Drive/CapturedTasks.org")
   :hook
   (org-mode . org-indent-mode)
@@ -433,19 +439,22 @@
   :hook
   (prog-mode . rainbow-mode))
 
-(use-package markdown-mode)
+(use-package markdown-mode
+  :mode "\\.md\\'")
 
 (use-package rainbow-delimiters
   :config
   (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
 
-(use-package expand-region
-  :bind
-  ("C-'" . 'er/expand-region))
+;; (use-package expand-region
+;;   :bind
+;;   ("C-'" . 'er/expand-region))
 
-(use-package restclient)
+(use-package restclient
+  :commands (restclient-mode))
 
-(use-package ob-restclient)
+(use-package ob-restclient
+  :after org)
 
 (use-package wgrep
   :init
@@ -491,7 +500,8 @@
     "bb" 'consult-buffer
     "," 'consult-recent-file))
 
-(use-package docker-compose-mode)
+(use-package docker-compose-mode
+  :mode "compose.ya?ml")
 
 (use-package evil-multiedit
   :config
