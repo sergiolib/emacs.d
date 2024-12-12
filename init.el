@@ -107,6 +107,9 @@
   (unbind-key (kbd "C-z"))
   (global-set-key (kbd "C-c e") 'open-init-file)
   (setq custom-file "~/.emacs.d/custom.el")
+  (setq completion-ignore-case t
+	read-file-name-completion-ignore-case t
+	read-buffer-completion-ignore-case t)
   :mode
   ("\\.tsx\\'" . tsx-ts-mode)
   ("\\.ts\\'" . typescript-ts-mode)
@@ -422,10 +425,6 @@
   (add-hook 'tsx-ts-mode-hook #'editorconfig-apply)
   :hook (tsx-ts-mode . editorconfig-mode))
 
-(use-package prettier-js
-  :hook
-  (tsx-ts-mode . prettier-js-mode))
-
 (use-package docker
   :bind
   ("C-c C-d d" . docker)
@@ -479,7 +478,8 @@
   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
   :custom
   (evil-undo-system 'undo-redo)
-  (evil-want-C-u-scroll t))
+  (evil-want-C-u-scroll t)
+  (evil-want-fine-undo t))
 
 (use-package evil-collection
   :after evil
@@ -524,4 +524,8 @@
 
 (use-package apheleia
   :config
-  (apheleia-global-mode 1))
+  (apheleia-global-mode 1)
+  (setq apheleia-formatters-respect-indent-level nil))
+
+(use-package combobulate
+  :ensure (:host github :repo "mickeynp/combobulate"))
