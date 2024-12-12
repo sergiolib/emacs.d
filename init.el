@@ -528,4 +528,5 @@
   (setq apheleia-formatters-respect-indent-level nil))
 
 (use-package combobulate
+  :commands (combobulate)
   :ensure (:host github :repo "mickeynp/combobulate"))
