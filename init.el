@@ -51,7 +51,7 @@
 (elpaca elpaca-use-package
   (elpaca-use-package-mode))
 
-;;(setq use-package-verbose 1)
+;; (setq use-package-verbose 1)
 (setq use-package-always-ensure t)
 
 (use-package emacs
@@ -211,10 +211,10 @@
   :hook
   (dired-mode . nerd-icons-dired-mode))
 
-(use-package vterm
-  :commands (vterm vterm-toggle))
+(use-package vterm)
 
 (use-package vterm-toggle
+  :after vterm
   :bind
   ("<f8>" . vterm-toggle)
   :config
