@@ -242,6 +242,10 @@
     (interactive)
     (find-file (f-join (project-root (project-current)) ".dir-locals.el")))
 
+  (defun sergio/consult-ripgrep ()
+    (interactive)
+    (consult-ripgrep (project-root (project-current))))
+
   (add-to-list 'project-switch-commands '(sergio/project-vterm "Vterm" "t"))
   (add-to-list 'project-switch-commands '(sergio/project-magit "Magit" "m"))
   (add-to-list 'project-switch-commands '(sergio/project-magit "Modify .dir-locals.el" "v"))
@@ -251,7 +255,8 @@
 					    project-switch-commands))
   (define-key project-prefix-map (kbd "t") 'sergio/project-vterm)
   (define-key project-prefix-map (kbd "m") 'sergio/project-magit)
-  (define-key project-prefix-map (kbd "v") 'sergio/modify-dir-locals))
+  (define-key project-prefix-map (kbd "v") 'sergio/modify-dir-locals)
+  (define-key project-prefix-map (kbd "g") 'sergio/consult-ripgrep))
 
 (use-package ruff-format
   :hook
@@ -527,3 +532,15 @@
 (use-package combobulate
   :commands (combobulate)
   :ensure (:host github :repo "mickeynp/combobulate"))
+
+(setenv "ANDROID_HOME" "/Users/sliberman/Library/Android/sdk")
+
+(use-package transient :ensure (:pin "0.7.4"))
+(use-package gptel
+  :config
+  (setq
+   gptel-model 'mistral:latest
+   gptel-backend (gptel-make-ollama "Ollama"
+		   :host "localhost:11434"
+		   :stream t
+		   :models '(mistral:latest))))
