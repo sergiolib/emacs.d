@@ -126,7 +126,6 @@
   (load-theme 'ef-elea-dark t))
 
 (use-package vertico
-  :ensure (:tag "1.9")
   :config
   (vertico-mode 1)
   :custom
@@ -144,19 +143,16 @@
   :bind	("C-c r" . 'vertico-repeat))
 
 (use-package marginalia
-  :ensure (:tag "1.7")
   :config
   (marginalia-mode 1))
 
 (use-package embark
-  :ensure (:tag "1.1")
   :custom
   (embark-quit-after-action nil)
   :bind
   ("C-." . embark-act))
 
 (use-package consult
-  :ensure (:tag "1.8")  
   :bind
   ("C-s" . consult-line)
   ("C-x b" . consult-buffer)
@@ -167,12 +163,10 @@
   :after embark)
 
 (use-package orderless
-  :ensure (:tag "1.1")
   :custom
   (completion-styles '(orderless basic)))
 
 (use-package corfu
-  :ensure (:tag "1.5")
   :init
   (global-corfu-mode 1)
   :custom
@@ -185,7 +179,6 @@
   (define-key corfu-map (kbd "TAB") 'corfu-insert))
 
 (use-package doom-modeline
-  :ensure (:tag "v4.1.0")
   :config
   (doom-modeline-mode 1)
   :custom
@@ -195,11 +188,9 @@
   (doom-modeline-modal-modern-icon nil)
   )
 
-(use-package all-the-icons
-  :ensure (:tag "5.0.0"))
+(use-package all-the-icons)
 
 (use-package nerd-icons-corfu
-  :ensure (:tag "v0.4.2")
   :after corfu
   :config
   (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
@@ -335,7 +326,6 @@
   ("\\Dockerfile\\'"))
 
 (use-package magit
-  ;;:ensure (:tag "v3.3.0")
   :bind
   ("C-c g" . magit-status)
   :custom
