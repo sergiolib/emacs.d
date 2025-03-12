@@ -347,7 +347,7 @@
   :config
   (global-git-gutter-mode 1))
 
-;; (use-package yasnippet)
+(use-package yasnippet)
 
 (use-package json-mode
   :mode
@@ -434,10 +434,6 @@
   :config
   (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
 
-;; (use-package expand-region
-;;   :bind
-;;   ("C-'" . 'er/expand-region))
-
 (use-package restclient
   :commands (restclient-mode))
 
@@ -449,11 +445,6 @@
   (require 'wgrep))
 (put 'downcase-region 'disabled nil)
 (put 'upcase-region 'disabled nil)
-
-;; (use-package multiple-cursors
-;;   :bind
-;;   ("C->" . mc/mark-next-like-this)
-;;   ("C-<" . mc/mark-previous-like-this))
 
 (use-package protobuf-ts-mode
   :mode "\\.proto\\'")
