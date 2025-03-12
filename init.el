@@ -146,12 +146,6 @@
   :config
   (marginalia-mode 1))
 
-(use-package embark
-  :custom
-  (embark-quit-after-action nil)
-  :bind
-  ("C-." . embark-act))
-
 (use-package consult
   :bind
   ("C-s" . consult-line)
@@ -480,6 +474,17 @@
   :after evil
   :config
   (evil-collection-setup))
+
+(use-package embark
+  :after evil
+  :custom
+  (embark-quit-after-action nil)
+  :bind ((:map evil-normal-state-map
+	       ("C-." . embark-act))
+	 (:map evil-insert-state-map
+	       ("C-." . embark-act))
+	 (:map evil-visual-state-map
+	       ("C-." . embark-act))))
 
 (use-package general
   :config
