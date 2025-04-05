@@ -51,7 +51,7 @@
 (elpaca elpaca-use-package
   (elpaca-use-package-mode))
 
-;; (setq use-package-verbose 1)
+(setq use-package-verbose 1)
 (setq use-package-always-ensure t)
 
 (use-package emacs
@@ -85,12 +85,12 @@
   (setq show-paren-style 'expression)
   (setq tab-always-indent 'complete)
   (electric-pair-mode t)
-  (setq display-line-numbers-type 'relative
-	display-line-numbers-widen t)
+  (setq ;;display-line-numbers-type 'relative
+   display-line-numbers-widen t)
   (global-display-line-numbers-mode 1)
   (setq excluded-hooks-from-display-numbers '(doc-view-mode-hook))
-  (mapc (lambda (hook) (add-hook hook
-				 #'(lambda () (display-line-numbers-mode 0))))
+  (mapc (lambda (hook)
+	  (add-hook hook #'(lambda () (display-line-numbers-mode 0))))
 	excluded-hooks-from-display-numbers)
   (let ((no-line-number-hooks '(vterm-mode-hook help-mode-hook)))
     (dolist (hook no-line-number-hooks)
@@ -99,7 +99,8 @@
   (winner-mode 1)
   (add-hook 'compilation-filter-hook 'ansi-color-compilation-filter)
   (add-hook 'compilation-filter-hook 'ansi-osc-compilation-filter)
-  (add-hook 'typescript-ts-mode-hook #'(lambda () (setq-local js-indent-level 2)))
+  (add-hook 'typescript-ts-mode-hook
+	    #'(lambda () (setq-local js-indent-level 2)))
   (add-hook 'tsx-ts-mode-hook #'(lambda () (setq-local js-indent-level 2)))
   (add-hook 'typescript-ts-mode-hook #'(lambda () (setq-local js-jsx-indent-level 2)))
   (add-hook 'tsx-ts-mode-hook #'(lambda () (setq-local js-jsx-indent-level 2)))
@@ -119,7 +120,11 @@
     (interactive)
     (find-file "~/.emacs.d/init.el"))
   (when (eq system-type 'gnu/linux)
-    (setenv "PATH" (concat "/Library/TeX/texbin/:" (getenv "PATH")))))
+    (setenv "PATH" (concat "/Library/TeX/texbin/:" (getenv "PATH"))))
+  :custom
+  (minibuffer-prompt-properties
+   '(read-only t cursor-intangible t face minibuffer-prompt))
+  (read-extended-command-predicate #'command-completion-default-include-p))
 
 (use-package ef-themes
   :config
@@ -157,8 +162,10 @@
   :after embark)
 
 (use-package orderless
-  :custom
-  (completion-styles '(orderless basic)))
+  :init
+  (setq completion-styles '(orderless partial-completion basic)
+	completion-category-defaults nil
+	completion-category-overrides nil))
 
 (use-package corfu
   :init
@@ -168,9 +175,40 @@
   (corfu-auto-prefix 3)
   (corfu-popupinfo-mode 1)
   :config
-  (corfu-echo-mode 1)
+  (corfu-echo-mode 0)
   (corfu-history-mode 1)
-  (define-key corfu-map (kbd "TAB") 'corfu-insert))
+  (define-key corfu-map (kbd "TAB") 'corfu-insert)
+  ;; SPC as separator
+  (setq corfu-separator 32)
+
+  ;; highly recommanded to use corfu-separator with "32" (space)
+  (define-key corfu-map (kbd "SPC")
+	      (lambda ()
+		(interactive)
+		(if current-prefix-arg
+		    ;;we suppose that we want leave the word like that, so do a space
+		    (progn
+		      (corfu-quit)
+		      (insert " "))
+		  (if (and (= (char-before) corfu-separator)
+			   (or
+			    ;; check if space, return or nothing after
+			    (not (char-after))
+			    (= (char-after) ?\s)
+			    (= (char-after) ?\n)))
+		      (progn
+			(corfu-insert)
+			(insert " "))
+		    (corfu-insert-separator)))))
+  (defun corfu-move-to-minibuffer ()
+    (interactive)
+    (pcase completion-in-region--data
+      (`(,beg ,end ,table ,pred ,extras)
+       (let ((completion-extra-properties extras)
+             completion-cycle-threshold completion-cycling)
+	 (consult-completion-in-region beg end table pred)))))
+  (keymap-set corfu-map "M-m" #'corfu-move-to-minibuffer)
+  (add-to-list 'corfu-continue-commands #'corfu-move-to-minibuffer))
 
 (use-package doom-modeline
   :config
@@ -199,7 +237,8 @@
   :hook
   (dired-mode . nerd-icons-dired-mode))
 
-(use-package vterm)
+(use-package vterm
+  :commands vterm vterm-toggle)
 
 (use-package vterm-toggle
   :bind
@@ -248,33 +287,33 @@
   (python-mode . ruff-format-on-save-mode)
   (python-ts-mode . ruff-format-on-save-mode))
 
-(use-package eglot
-  :ensure nil
-  :commands (eglot eglot-ensure)
-  :init
-  (add-hook 'python-base-mode-hook 'eglot-ensure 100)
-  (add-hook 'terraform-mode-hook 'eglot-ensure 100)
-  (add-hook 'tsx-ts-mode-hook 'eglot-ensure 100)
-  (add-hook 'typescript-ts-mode-hook 'eglot-ensure 100)
-  :config
-  (setq eglot-events-buffer-size 0)
-  (fset #'jsonrpc--log-event #'ignore)
-  (setq gc-cons-threshold 800000
-	read-process-output-max (* 1024 1024))
-  (set-face-attribute 'eglot-diagnostic-tag-unnecessary-face nil :underline t :slant 'italic)
-  (define-key eglot-mode-map (kbd "C-c l r") 'eglot-rename)
-  (define-key eglot-mode-map (kbd "C-c l a") 'eglot-code-actions)
-  (define-key eglot-mode-map (kbd "C-c l =") 'eglot-format-buffer)
-  (define-key eglot-mode-map (kbd "C-c l e") 'flymake-show-buffer-diagnostics) 
-  (define-key eglot-mode-map (kbd "<mouse-8>") 'xref-go-back)
-  (define-key eglot-mode-map (kbd "<drag-mouse-8>") 'xref-go-back)
-  (define-key eglot-mode-map (kbd "<mouse-9>") 'xref-go-forward)
-  (define-key eglot-mode-map (kbd "<drag-mouse-9>") 'xref-go-forward))
+;; (use-package eglot
+;;   :ensure nil
+;;   :commands (eglot eglot-ensure)
+;;   :init
+;;   (add-hook 'python-base-mode-hook 'eglot-ensure 100)
+;;   (add-hook 'terraform-mode-hook 'eglot-ensure 100)
+;;   (add-hook 'tsx-ts-mode-hook 'eglot-ensure 100)
+;;   (add-hook 'typescript-ts-mode-hook 'eglot-ensure 100)
+;;   :config
+;;   (setq eglot-events-buffer-size 0)
+;;   (fset #'jsonrpc--log-event #'ignore)
+;;   (setq gc-cons-threshold 800000
+;; 	read-process-output-max (* 1024 1024))
+;;   (set-face-attribute 'eglot-diagnostic-tag-unnecessary-face nil :underline t :slant 'italic)
+;;   (define-key eglot-mode-map (kbd "C-c l r") 'eglot-rename)
+;;   (define-key eglot-mode-map (kbd "C-c l a") 'eglot-code-actions)
+;;   (define-key eglot-mode-map (kbd "C-c l =") 'eglot-format-buffer)
+;;   (define-key eglot-mode-map (kbd "C-c l e") 'flymake-show-buffer-diagnostics) 
+;;   (define-key eglot-mode-map (kbd "<mouse-8>") 'xref-go-back)
+;;   (define-key eglot-mode-map (kbd "<drag-mouse-8>") 'xref-go-back)
+;;   (define-key eglot-mode-map (kbd "<mouse-9>") 'xref-go-forward)
+;;   (define-key eglot-mode-map (kbd "<drag-mouse-9>") 'xref-go-forward))
 
-(use-package eglot-booster
-  :after eglot
-  :ensure (:host github :repo "jdtsmith/eglot-booster")
-  :config (eglot-booster-mode))
+;; (use-package eglot-booster
+;;   :after eglot
+;;   :ensure (:host github :repo "jdtsmith/eglot-booster")
+;;   :config (eglot-booster-mode))
 
 (use-package python
   :ensure nil
@@ -297,7 +336,7 @@
 
 (use-package cape
   :config
-  (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
+  ;; (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
   (defun add-cape-file-to-python-capfs ()
     (add-hook 'completion-at-point-functions #'cape-file nil t)
     (remove-hook 'completion-at-point-functions 'python-completion-at-point t)
@@ -347,7 +386,9 @@
   :config
   (global-git-gutter-mode 1))
 
-(use-package yasnippet)
+(use-package yasnippet
+  :hook
+  (lsp-mode . yas-minor-mode))
 
 (use-package json-mode
   :mode
@@ -449,64 +490,67 @@
 (use-package protobuf-ts-mode
   :mode "\\.proto\\'")
 
-(use-package evil
-  :init
-  (setq evil-want-keybinding nil)
-  :config
-  (evil-mode 1)
-  (global-set-key (kbd "C-M-u") 'universal-argument)
-  (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
-  :custom
-  (evil-undo-system 'undo-redo)
-  (evil-want-C-u-scroll t)
-  (evil-want-fine-undo t))
+;; (use-package evil
+;;   :init
+;;   (setq evil-want-keybinding nil)
+;;   :config
+;;   (evil-mode 1)
+;;   (global-set-key (kbd "C-M-u") 'universal-argument)
+;;   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+;;   :custom
+;;   (evil-undo-system 'undo-redo)
+;;   (evil-want-C-u-scroll t)
+;;   (evil-want-fine-undo t))
 
-(use-package evil-collection
-  :after evil
-  :config
-  (evil-collection-setup))
+;; (use-package evil-collection
+;;   :after evil
+;;   :config
+;;   (evil-collection-setup))
 
 (use-package embark
-  :after evil
+  ;; :after evil
   :custom
   (embark-quit-after-action nil)
-  :bind ((:map evil-normal-state-map
-	       ("C-." . embark-act))
-	 (:map evil-insert-state-map
-	       ("C-." . embark-act))
-	 (:map evil-visual-state-map
-	       ("C-." . embark-act))))
+  ;; :bind ((:map evil-normal-state-map
+  ;; 	       ("C-." . embark-act))
+  ;; 	 (:map evil-insert-state-map
+  ;; 	       ("C-." . embark-act))
+  ;; 	 (:map evil-visual-state-map
+  ;; 	       ("C-." . embark-act)))
+  :bind
+  ("C-." . embark-act)
+  )
 
-(use-package general
-  :config
-  (general-create-definer leader
-    :keymaps '(normal insert visual emacs)
-    :prefix "SPC"
-    :global-prefix "C-SPC")
-  (leader
-    "p" '(:keymap project-prefix-map :package project)
-    "e" '(:ignore t :which-key "Emacs")
-    "ee" '((lambda () (interactive) (find-file user-init-file)) :which-key "Visit init file")
-    "b" '(:ignore t :which-key "Buffers")
-    "bb" 'consult-buffer
-    "," 'consult-recent-file))
+;; (use-package general
+;;   :config
+;;   (general-create-definer leader
+;;     :keymaps '(normal insert visual emacs)
+;;     :prefix "SPC"
+;;     :global-prefix "C-SPC")
+;;   (leader
+;;     "p" '(:keymap project-prefix-map :package project)
+;;     "e" '(:ignore t :which-key "Emacs")
+;;     "ee" '((lambda () (interactive) (find-file user-init-file)) :which-key "Visit init file")
+;;     "b" '(:ignore t :which-key "Buffers")
+;;     "bb" 'consult-buffer
+;;     "," 'consult-recent-file))
 
 (use-package docker-compose-mode
   :mode "compose.ya?ml")
 
-(use-package evil-multiedit
-  :config
-  (evil-multiedit-default-keybinds)
-  (evil-define-key '(insert normal visual) evil-multiedit-mode-map (kbd "RET") nil)
-  (evil-define-key '(insert normal visual) evil-multiedit-mode-map (kbd "C-c d") 'evil-multiedit-toggle-or-restrict-region))
+;; (use-package evil-multiedit
+;;   :config
+;;   (evil-multiedit-default-keybinds)
+;;   (evil-define-key '(insert normal visual) evil-multiedit-mode-map (kbd "RET") nil)
+;;   (evil-define-key '(insert normal visual) evil-multiedit-mode-map (kbd "C-c d") 'evil-multiedit-toggle-or-restrict-region))
 
-(use-package evil-nerd-commenter
-  :bind
-  ("M-;" . evilnc-comment-or-uncomment-lines))
+;; (use-package evil-nerd-commenter
+;;   :bind
+;;   ("M-;" . evilnc-comment-or-uncomment-lines))
 
-(use-package evil-surround
-  :config
-  (global-evil-surround-mode 1))
+;; (use-package evil-surround
+;;   :config
+;;   (global-evil-surround-mode 1))
 
 (use-package helpful
   :bind
@@ -526,6 +570,7 @@
 
 (use-package transient :ensure (:pin "0.7.4"))
 (use-package gptel
+  :commands gptel
   :config
   (setq
    gptel-model 'deepseek-r1:8b
@@ -584,3 +629,32 @@
 
   (add-hook 'jtsx-jsx-mode-hook 'jtsx-bind-keys-to-jtsx-jsx-mode-map)
   (add-hook 'jtsx-tsx-mode-hook 'jtsx-bind-keys-to-jtsx-tsx-mode-map))
+
+(use-package lsp-mode
+  :init
+  (setq gc-cons-threshold 100000000)
+  (setq lsp-keymap-prefix "C-c l")
+  (defun my/orderless-dispatch-flex-first (_pattern index _total)
+    (and (eq index 0) 'orderless-flex))
+
+  (defun my/lsp-mode-setup-completion ()
+    (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+          '(orderless))
+    ;; Optionally configure the first word as flex filtered.
+    (add-hook 'orderless-style-dispatchers #'my/orderless-dispatch-flex-first nil 'local)
+    ;; Optionally configure the cape-capf-buster.
+    (setq-local completion-at-point-functions (list (cape-capf-buster #'lsp-completion-at-point))))
+  :custom
+  (lsp-completion-provider :none)
+  :hook (
+         (typescript-ts-base-mode . lsp)
+         (lsp-mode . lsp-enable-which-key-integration)
+	 (lsp-completion-mode . my/lsp-mode-setup-completion))
+  :commands lsp)
+
+(use-package lsp-ui :commands lsp-ui-mode)
+
+(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+
+(use-package dap-mode
+  :commands dap-debug)
