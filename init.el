@@ -210,15 +210,15 @@
   (keymap-set corfu-map "M-m" #'corfu-move-to-minibuffer)
   (add-to-list 'corfu-continue-commands #'corfu-move-to-minibuffer))
 
-(use-package doom-modeline
-  :config
-  (doom-modeline-mode 1)
-  :custom
-  (doom-modeline-height 25)
-  (doom-modeline-buffer-encoding nil)
-  (doom-modeline-modal-icon nil)
-  (doom-modeline-modal-modern-icon nil)
-  )
+;; (use-package doom-modeline
+;;   :config
+;;   (doom-modeline-mode 1)
+;;   :custom
+;;   (doom-modeline-height 25)
+;;   (doom-modeline-buffer-encoding nil)
+;;   (doom-modeline-modal-icon nil)
+;;   (doom-modeline-modal-modern-icon nil)
+;;   )
 
 (use-package all-the-icons)
 
@@ -570,14 +570,14 @@
 
 (use-package transient :ensure (:pin "0.7.4"))
 (use-package gptel
-  :commands gptel
+  :commands (gptel gptel-send)
   :config
-  (setq
-   gptel-model 'deepseek-r1:8b
-   gptel-backend (gptel-make-ollama "Ollama"
-		   :host "localhost:11434"
-		   :stream t
-		   :models '(deepseek-r1:8b))))
+  (load-file "secrets.el")
+  (gptel-make-ollama "Ollama"
+    :host "localhost:11434"
+    :stream t
+    :models '(qwen2.5-coder:0.5b))
+  )
 
 (use-package jtsx
   :ensure t
