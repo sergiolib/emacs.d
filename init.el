@@ -572,7 +572,7 @@
 (use-package gptel
   :commands (gptel gptel-send)
   :config
-  (load-file "secrets.el")
+  (load-file "~/.emacs.d/secrets.el")
   (gptel-make-ollama "Ollama"
     :host "localhost:11434"
     :stream t
