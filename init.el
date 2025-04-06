@@ -317,19 +317,21 @@
 
 (use-package python
   :ensure nil
-  :config
-  (add-hook 'python-base-mode-hook 'pyvenv-mode)
-  (add-hook 'python-base-mode-hook 'poetry-tracking-mode 10)
   :mode
   ("\\.py\\'" . python-ts-mode))
 
-
 (use-package pyvenv
-  :commands (pyvenv-mode)
-  )
+  :config
+  (pyvenv-tracking-mode 1)
+  (defun my-python-poetry-venv()
+    "Activate the poetry virtualenv for the current project."
+    (let ((venv (shell-command-to-string "poetry env info --path")))
+      (when venv
+	(setq venv (string-trim venv))  ; Remove whitespace
+	(pyvenv-activate venv))))
 
-(use-package poetry
-  :commands (poetry-tracking-mode poetry))
+  (add-hook 'python-base-mode-hook 'my-python-poetry-venv)
+  (add-hook 'pyvenv-post-activate-hooks 'lsp))
 
 (use-package terraform-mode
   :mode "\\.tf\\'")
