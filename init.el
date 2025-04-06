@@ -659,4 +659,11 @@
 (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
 
 (use-package dap-mode
-  :commands dap-debug)
+  :commands dap-debug
+  :config
+  (setq dap-auto-configure-features '(sessions locals breakpoints expressions tooltip))
+  (dap-auto-configure-mode)
+  (require 'dap-python)
+  ;; if you installed debugpy, you need to set this
+  ;; https://github.com/emacs-lsp/dap-mode/issues/306
+  (setq dap-python-debugger 'debugpy))
