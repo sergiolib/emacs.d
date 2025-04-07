@@ -237,10 +237,10 @@
   :hook
   (dired-mode . nerd-icons-dired-mode))
 
-(use-package vterm
-  :commands vterm vterm-toggle)
+(use-package vterm)
 
 (use-package vterm-toggle
+  :commands (vterm-toggle)
   :bind
   ("<f8>" . vterm-toggle)
   :config
@@ -462,7 +462,9 @@
   ("C-c C-d C-d" . docker)
   ("C-c C-d C-c" . docker-compose)
   :init
-  (setq docker-compose-command "docker compose"))
+  (setq docker-compose-command "docker compose")
+  :config
+  (setq docker-run-async-with-buffer-function 'docker-run-async-with-buffer-vterm))
 
 (use-package rainbow-mode
   :hook
