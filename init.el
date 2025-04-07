@@ -317,19 +317,21 @@
 
 (use-package python
   :ensure nil
-  :config
-  (add-hook 'python-base-mode-hook 'pyvenv-mode)
-  (add-hook 'python-base-mode-hook 'poetry-tracking-mode 10)
   :mode
   ("\\.py\\'" . python-ts-mode))
 
-
 (use-package pyvenv
-  :commands (pyvenv-mode)
-  )
+  :config
+  (pyvenv-tracking-mode 1)
+  (defun my-python-poetry-venv()
+    "Activate the poetry virtualenv for the current project."
+    (let ((venv (shell-command-to-string "poetry env info --path")))
+      (when venv
+	(setq venv (string-trim venv))  ; Remove whitespace
+	(pyvenv-activate venv))))
 
-(use-package poetry
-  :commands (poetry-tracking-mode poetry))
+  (add-hook 'python-base-mode-hook 'my-python-poetry-venv)
+  (add-hook 'pyvenv-post-activate-hooks 'lsp))
 
 (use-package terraform-mode
   :mode "\\.tf\\'")
@@ -659,4 +661,11 @@
 (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
 
 (use-package dap-mode
-  :commands dap-debug)
+  :commands dap-debug
+  :config
+  (setq dap-auto-configure-features '(sessions locals breakpoints expressions tooltip))
+  (dap-auto-configure-mode)
+  (require 'dap-python)
+  ;; if you installed debugpy, you need to set this
+  ;; https://github.com/emacs-lsp/dap-mode/issues/306
+  (setq dap-python-debugger 'debugpy))
