@@ -326,11 +326,11 @@
 (use-package pyvenv
   :config
   (pyvenv-tracking-mode 1)
-  (defun my-python-poetry-venv()
+  (defun my-python-poetry-venv ()
     "Activate the poetry virtualenv for the current project."
     (let ((venv (shell-command-to-string "poetry env info --path")))
       (when venv
-	(setq venv (string-trim venv))  ; Remove whitespace
+	(setq venv (string-trim venv))
 	(pyvenv-activate venv))))
 
   (add-hook 'python-base-mode-hook 'my-python-poetry-venv)
@@ -578,7 +578,6 @@
   (emacs-lisp-mode . eldoc-mode))
 
 (use-package apheleia
-  :diminish apheleia-mode
   :config
   (apheleia-global-mode 1)
   (setq apheleia-formatters-respect-indent-level nil))
@@ -661,9 +660,7 @@
   (defun my/lsp-mode-setup-completion ()
     (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
           '(orderless))
-    ;; Optionally configure the first word as flex filtered.
     (add-hook 'orderless-style-dispatchers #'my/orderless-dispatch-flex-first nil 'local)
-    ;; Optionally configure the cape-capf-buster.
     (setq-local completion-at-point-functions (list (cape-capf-buster #'lsp-completion-at-point))))
   :custom
   (lsp-completion-provider :none)
