@@ -27,3 +27,4 @@ custom.el
 network-security.data
 tree-sitter/
 url/
+/secrets.el
