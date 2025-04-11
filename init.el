@@ -54,7 +54,10 @@
 (setq use-package-verbose 1)
 (setq use-package-always-ensure t)
 
+(use-package diminish)
+
 (use-package emacs
+  :diminish auto-revert-mode
   :ensure nil
   :config
   (setq enable-recursive-minibuffers t)
@@ -153,7 +156,7 @@
 
 (use-package consult
   :bind
-  ("C-s" . consult-line)
+  ;;("C-s" . consult-line)
   ("C-x b" . consult-buffer)
   ("C-x ," . consult-recent-file)
   ("M-y" . consult-yank-pop))
@@ -353,6 +356,7 @@
   (add-hook 'terraform-mode-hook #'add-cape-file-to-tf-capfs))
 
 (use-package which-key
+  :diminish which-key-mode
   :config
   (which-key-mode 1))
 
@@ -374,6 +378,7 @@
   (add-hook 'yaml-ts-mode-hook (lambda () (setq-local tab-width 2))))
 
 (use-package envrc
+  :diminish envrc-mode
   :config
   (envrc-global-mode))
 
@@ -385,6 +390,7 @@
   (move-text-default-bindings))
 
 (use-package git-gutter
+  :diminish git-gutter-mode
   :config
   (global-git-gutter-mode 1))
 
@@ -417,17 +423,21 @@
   (org-agenda-files (if (eq system-type 'gnu/linux)
 			(append (f-files "~/Documents/Notes" #'(lambda (f) (s-ends-with? ".org" f)) t)
 				'("~/Insync/sergiolib@gmail.com/Google Drive/Agenda.org"))
-		      (append '("~/Documents/agenda.org") (f-files "/Users/sliberman/Library/CloudStorage/GoogleDrive-sergiolib@gmail.com/My Drive/Notes/" #'(lambda (f) (s-ends-with? ".org" f)) t))))
-  (org-default-notes-file "~/Insync/sergiolib@gmail.com/Google Drive/CapturedTasks.org")
+		      (append '("/Users/sliberman/Library/CloudStorage/GoogleDrive-sergiolib@gmail.com/My Drive/Agenda.org") (f-files "/Users/sliberman/Library/CloudStorage/GoogleDrive-sergiolib@gmail.com/My Drive/Notes/" #'(lambda (f) (s-ends-with? ".org" f)) t))))
+  (org-default-notes-file `(if (eq system-type 'gnu/linux)
+			       "~/Insync/sergiolib@gmail.com/Google Drive/CapturedTasks.org"
+			     "/Users/sliberman/Library/CloudStorage/GoogleDrive-sergiolib@gmail.com/My Drive/CapturedTasks.org"))
   :hook
   (org-mode . org-indent-mode)
   (org-mode . (lambda () (electric-indent-local-mode -1)))
+  (org-mode . (lambda () (display-line-numbers-mode -1)))
   :config
   (require 'org-tempo)
   (add-to-list 'org-structure-template-alist '("sql" . "src sql"))
   (add-to-list 'org-structure-template-alist '("rest" . "src restclient"))
   (add-to-list 'org-structure-template-alist '("sh" . "src bash"))
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+  (add-to-list 'org-structure-template-alist '("py" . "src python"))
   (add-hook
    'org-mode-hook
    (lambda ()
@@ -469,6 +479,7 @@
   (setq docker-run-async-with-buffer-function 'docker-run-async-with-buffer-vterm))
 
 (use-package rainbow-mode
+  :diminish rainbow-mode
   :hook
   (prog-mode . rainbow-mode))
 
@@ -561,7 +572,13 @@
   ("C-h v" . helpful-variable)
   ("C-h f" . helpful-function))
 
+(use-package eldoc
+  :diminish eldoc-mode
+  :hook
+  (emacs-lisp-mode . eldoc-mode))
+
 (use-package apheleia
+  :diminish apheleia-mode
   :config
   (apheleia-global-mode 1)
   (setq apheleia-formatters-respect-indent-level nil))
@@ -650,8 +667,7 @@
     (setq-local completion-at-point-functions (list (cape-capf-buster #'lsp-completion-at-point))))
   :custom
   (lsp-completion-provider :none)
-  :hook (
-         (typescript-ts-base-mode . lsp)
+  :hook ((typescript-ts-base-mode . lsp)
          (lsp-mode . lsp-enable-which-key-integration)
 	 (lsp-completion-mode . my/lsp-mode-setup-completion))
   :commands lsp)
@@ -669,3 +685,7 @@
   ;; if you installed debugpy, you need to set this
   ;; https://github.com/emacs-lsp/dap-mode/issues/306
   (setq dap-python-debugger 'debugpy))
+
+(use-package lsp-pyright)
+
+(pixel-scroll-mode 1)
