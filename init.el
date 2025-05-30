@@ -285,33 +285,33 @@
   (define-key project-prefix-map (kbd "v") 'sergio/modify-dir-locals)
   (define-key project-prefix-map (kbd "g") 'sergio/consult-ripgrep))
 
-(use-package ruff-format
-  :hook
-  (python-mode . ruff-format-on-save-mode)
-  (python-ts-mode . ruff-format-on-save-mode))
+;; (use-package ruff-format
+;;   :hook
+;;   (python-mode . ruff-format-on-save-mode)
+;;   (python-ts-mode . ruff-format-on-save-mode))
 
-;; (use-package eglot
-;;   :ensure nil
-;;   :commands (eglot eglot-ensure)
-;;   :init
-;;   (add-hook 'python-base-mode-hook 'eglot-ensure 100)
-;;   (add-hook 'terraform-mode-hook 'eglot-ensure 100)
-;;   (add-hook 'tsx-ts-mode-hook 'eglot-ensure 100)
-;;   (add-hook 'typescript-ts-mode-hook 'eglot-ensure 100)
-;;   :config
-;;   (setq eglot-events-buffer-size 0)
-;;   (fset #'jsonrpc--log-event #'ignore)
-;;   (setq gc-cons-threshold 800000
-;; 	read-process-output-max (* 1024 1024))
-;;   (set-face-attribute 'eglot-diagnostic-tag-unnecessary-face nil :underline t :slant 'italic)
-;;   (define-key eglot-mode-map (kbd "C-c l r") 'eglot-rename)
-;;   (define-key eglot-mode-map (kbd "C-c l a") 'eglot-code-actions)
-;;   (define-key eglot-mode-map (kbd "C-c l =") 'eglot-format-buffer)
-;;   (define-key eglot-mode-map (kbd "C-c l e") 'flymake-show-buffer-diagnostics) 
-;;   (define-key eglot-mode-map (kbd "<mouse-8>") 'xref-go-back)
-;;   (define-key eglot-mode-map (kbd "<drag-mouse-8>") 'xref-go-back)
-;;   (define-key eglot-mode-map (kbd "<mouse-9>") 'xref-go-forward)
-;;   (define-key eglot-mode-map (kbd "<drag-mouse-9>") 'xref-go-forward))
+(use-package eglot
+  :ensure nil
+  :commands (eglot eglot-ensure)
+  :init
+  (add-hook 'python-base-mode-hook 'eglot-ensure 100)
+  (add-hook 'terraform-mode-hook 'eglot-ensure 100)
+  (add-hook 'tsx-ts-mode-hook 'eglot-ensure 100)
+  (add-hook 'typescript-ts-mode-hook 'eglot-ensure 100)
+  :config
+  (setq eglot-events-buffer-size 0)
+  (fset #'jsonrpc--log-event #'ignore)
+  (setq gc-cons-threshold 800000
+	read-process-output-max (* 1024 1024))
+  (set-face-attribute 'eglot-diagnostic-tag-unnecessary-face nil :underline t :slant 'italic)
+  (define-key eglot-mode-map (kbd "C-c l r") 'eglot-rename)
+  (define-key eglot-mode-map (kbd "C-c l a") 'eglot-code-actions)
+  (define-key eglot-mode-map (kbd "C-c l =") 'eglot-format-buffer)
+  (define-key eglot-mode-map (kbd "C-c l e") 'flymake-show-buffer-diagnostics) 
+  (define-key eglot-mode-map (kbd "<mouse-8>") 'xref-go-back)
+  (define-key eglot-mode-map (kbd "<drag-mouse-8>") 'xref-go-back)
+  (define-key eglot-mode-map (kbd "<mouse-9>") 'xref-go-forward)
+  (define-key eglot-mode-map (kbd "<drag-mouse-9>") 'xref-go-forward))
 
 ;; (use-package eglot-booster
 ;;   :after eglot
@@ -323,18 +323,19 @@
   :mode
   ("\\.py\\'" . python-ts-mode))
 
-(use-package pyvenv
-  :config
-  (pyvenv-tracking-mode 1)
-  (defun my-python-poetry-venv ()
-    "Activate the poetry virtualenv for the current project."
-    (let ((venv (shell-command-to-string "poetry env info --path")))
-      (when venv
-	(setq venv (string-trim venv))
-	(pyvenv-activate venv))))
+;; (use-package pyvenv
+;;   :config
+;;   (pyvenv-tracking-mode 1)
+;;   (defun my-python-poetry-venv ()
+;;     "Activate the poetry virtualenv for the current project."
+;;     (let ((venv (shell-command-to-string "poetry env info --path")))
+;;       (when venv
+;; 	(setq venv (string-trim venv))
+;; 	(pyvenv-activate venv))))
 
-  (add-hook 'python-base-mode-hook 'my-python-poetry-venv)
-  (add-hook 'pyvenv-post-activate-hooks 'lsp))
+;;   (add-hook 'python-base-mode-hook 'my-python-poetry-venv)
+;;   ;;(add-hook 'pyvenv-post-activate-hooks 'lsp)
+;;   )
 
 (use-package terraform-mode
   :mode "\\.tf\\'")
@@ -419,14 +420,14 @@
   ("C-c s" . org-store-link)
   :custom
   (org-indent-indentation-per-level 1)
-  (rorg-edit-src-content-indentation 0)
-  (org-agenda-files (if (eq system-type 'gnu/linux)
-			(append (f-files "~/Documents/Notes" #'(lambda (f) (s-ends-with? ".org" f)) t)
-				'("~/Insync/sergiolib@gmail.com/Google Drive/Agenda.org"))
-		      (append '("/Users/sliberman/Library/CloudStorage/GoogleDrive-sergiolib@gmail.com/My Drive/Agenda.org") (f-files "/Users/sliberman/Library/CloudStorage/GoogleDrive-sergiolib@gmail.com/My Drive/Notes/" #'(lambda (f) (s-ends-with? ".org" f)) t))))
-  (org-default-notes-file `(if (eq system-type 'gnu/linux)
-			       "~/Insync/sergiolib@gmail.com/Google Drive/CapturedTasks.org"
-			     "/Users/sliberman/Library/CloudStorage/GoogleDrive-sergiolib@gmail.com/My Drive/CapturedTasks.org"))
+  (org-edit-src-content-indentation 0)
+  ;; (org-agenda-files (if (eq system-type 'gnu/linux)
+  ;; 			(append (f-files "~/Documents/Notes" #'(lambda (f) (s-ends-with? ".org" f)) t)
+  ;; 				'("~/Insync/sergiolib@gmail.com/Google Drive/Agenda.org"))
+  ;; 		      (append '("/Users/sliberman/Library/CloudStorage/GoogleDrive-sergiolib@gmail.com/My Drive/Agenda.org") (f-files "/Users/sliberman/Library/CloudStorage/GoogleDrive-sergiolib@gmail.com/My Drive/Notes/" #'(lambda (f) (s-ends-with? ".org" f)) t))))
+  ;; (org-default-notes-file `(if (eq system-type 'gnu/linux)
+  ;; 			       "~/Insync/sergiolib@gmail.com/Google Drive/CapturedTasks.org"
+  ;; 			     "/Users/sliberman/Library/CloudStorage/GoogleDrive-sergiolib@gmail.com/My Drive/CapturedTasks.org"))
   :hook
   (org-mode . org-indent-mode)
   (org-mode . (lambda () (electric-indent-local-mode -1)))
@@ -572,11 +573,6 @@
   ("C-h v" . helpful-variable)
   ("C-h f" . helpful-function))
 
-(use-package eldoc
-  :diminish eldoc-mode
-  :hook
-  (emacs-lisp-mode . eldoc-mode))
-
 (use-package apheleia
   :config
   (apheleia-global-mode 1)
@@ -650,39 +646,45 @@
   (add-hook 'jtsx-jsx-mode-hook 'jtsx-bind-keys-to-jtsx-jsx-mode-map)
   (add-hook 'jtsx-tsx-mode-hook 'jtsx-bind-keys-to-jtsx-tsx-mode-map))
 
-(use-package lsp-mode
-  :init
-  (setq gc-cons-threshold 100000000)
-  (setq lsp-keymap-prefix "C-c l")
-  (defun my/orderless-dispatch-flex-first (_pattern index _total)
-    (and (eq index 0) 'orderless-flex))
+;; (use-package lsp-mode
+;;   :init
+;;   (setq gc-cons-threshold 100000000)
+;;   (setq lsp-keymap-prefix "C-c l")
+;;   (defun my/orderless-dispatch-flex-first (_pattern index _total)
+;;     (and (eq index 0) 'orderless-flex))
 
-  (defun my/lsp-mode-setup-completion ()
-    (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-          '(orderless))
-    (add-hook 'orderless-style-dispatchers #'my/orderless-dispatch-flex-first nil 'local)
-    (setq-local completion-at-point-functions (list (cape-capf-buster #'lsp-completion-at-point))))
-  :custom
-  (lsp-completion-provider :none)
-  :hook ((typescript-ts-base-mode . lsp)
-         (lsp-mode . lsp-enable-which-key-integration)
-	 (lsp-completion-mode . my/lsp-mode-setup-completion))
-  :commands lsp)
+;;   (defun my/lsp-mode-setup-completion ()
+;;     (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+;;           '(orderless))
+;;     (add-hook 'orderless-style-dispatchers #'my/orderless-dispatch-flex-first nil 'local)
+;;     (setq-local completion-at-point-functions (list (cape-capf-buster #'lsp-completion-at-point))))
+;;   :custom
+;;   (lsp-completion-provider :none)
+;;   :hook (;;(typescript-ts-base-mode . lsp)
+;;          (lsp-mode . lsp-enable-which-key-integration)
+;; 	 (lsp-completion-mode . my/lsp-mode-setup-completion))
+;;   :commands lsp)
 
-(use-package lsp-ui :commands lsp-ui-mode)
+;; (use-package lsp-ui :commands lsp-ui-mode)
 
-(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+;; (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
 
-(use-package dap-mode
-  :commands dap-debug
-  :config
-  (setq dap-auto-configure-features '(sessions locals breakpoints expressions tooltip))
-  (dap-auto-configure-mode)
-  (require 'dap-python)
-  ;; if you installed debugpy, you need to set this
-  ;; https://github.com/emacs-lsp/dap-mode/issues/306
-  (setq dap-python-debugger 'debugpy))
+;; (use-package dap-mode
+;;   :commands dap-debug
+;;   :config
+;;   (setq dap-auto-configure-features '(sessions locals breakpoints expressions tooltip))
+;;   (dap-auto-configure-mode)
+;;   (require 'dap-python)
+;;   ;; if you installed debugpy, you need to set this
+;;   ;; https://github.com/emacs-lsp/dap-mode/issues/306
+;;   (setq dap-python-debugger 'debugpy))
 
-(use-package lsp-pyright)
+(use-package dape
+  :after eglot)
+
+;; (use-package lsp-pyright
+;;   :after lsp)
+
+(use-package flymake)
 
 (pixel-scroll-mode 1)
