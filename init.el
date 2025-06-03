@@ -88,7 +88,8 @@
   (setq show-paren-style 'expression)
   (setq tab-always-indent 'complete)
   (electric-pair-mode t)
-  (setq ;;display-line-numbers-type 'relative
+  (setq
+   display-line-numbers-type 'relative
    display-line-numbers-widen t)
   (global-display-line-numbers-mode 1)
   (setq excluded-hooks-from-display-numbers '(doc-view-mode-hook))
@@ -506,67 +507,67 @@
 (use-package protobuf-ts-mode
   :mode "\\.proto\\'")
 
-;; (use-package evil
-;;   :init
-;;   (setq evil-want-keybinding nil)
-;;   :config
-;;   (evil-mode 1)
-;;   (global-set-key (kbd "C-M-u") 'universal-argument)
-;;   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
-;;   :custom
-;;   (evil-undo-system 'undo-redo)
-;;   (evil-want-C-u-scroll t)
-;;   (evil-want-fine-undo t))
+(use-package evil
+  :init
+  (setq evil-want-keybinding nil)
+  :config
+  (evil-mode 1)
+  (global-set-key (kbd "C-M-u") 'universal-argument)
+  (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+  :custom
+  (evil-undo-system 'undo-redo)
+  (evil-want-C-u-scroll t)
+  (evil-want-fine-undo t))
 
-;; (use-package evil-collection
-;;   :after evil
-;;   :config
-;;   (evil-collection-setup))
+(use-package evil-collection
+  :after evil
+  :config
+  (evil-collection-setup))
 
 (use-package embark
-  ;; :after evil
+  :after evil
   :custom
   (embark-quit-after-action nil)
-  ;; :bind ((:map evil-normal-state-map
-  ;; 	       ("C-." . embark-act))
-  ;; 	 (:map evil-insert-state-map
-  ;; 	       ("C-." . embark-act))
-  ;; 	 (:map evil-visual-state-map
-  ;; 	       ("C-." . embark-act)))
+  :bind ((:map evil-normal-state-map
+	       ("C-." . embark-act))
+	 (:map evil-insert-state-map
+	       ("C-." . embark-act))
+	 (:map evil-visual-state-map
+	       ("C-." . embark-act)))
   :bind
   ("C-." . embark-act)
   )
 
-;; (use-package general
-;;   :config
-;;   (general-create-definer leader
-;;     :keymaps '(normal insert visual emacs)
-;;     :prefix "SPC"
-;;     :global-prefix "C-SPC")
-;;   (leader
-;;     "p" '(:keymap project-prefix-map :package project)
-;;     "e" '(:ignore t :which-key "Emacs")
-;;     "ee" '((lambda () (interactive) (find-file user-init-file)) :which-key "Visit init file")
-;;     "b" '(:ignore t :which-key "Buffers")
-;;     "bb" 'consult-buffer
-;;     "," 'consult-recent-file))
+(use-package general
+  :config
+  (general-create-definer leader
+    :keymaps '(normal insert visual emacs)
+    :prefix "SPC"
+    :global-prefix "C-SPC")
+  (leader
+    "p" '(:keymap project-prefix-map :package project)
+    "e" '(:ignore t :which-key "Emacs")
+    "ee" '((lambda () (interactive) (find-file user-init-file)) :which-key "Visit init file")
+    "b" '(:ignore t :which-key "Buffers")
+    "bb" 'consult-buffer
+    "," 'consult-recent-file))
 
 (use-package docker-compose-mode
   :mode "compose.ya?ml")
 
-;; (use-package evil-multiedit
-;;   :config
-;;   (evil-multiedit-default-keybinds)
-;;   (evil-define-key '(insert normal visual) evil-multiedit-mode-map (kbd "RET") nil)
-;;   (evil-define-key '(insert normal visual) evil-multiedit-mode-map (kbd "C-c d") 'evil-multiedit-toggle-or-restrict-region))
+(use-package evil-multiedit
+  :config
+  (evil-multiedit-default-keybinds)
+  (evil-define-key '(insert normal visual) evil-multiedit-mode-map (kbd "RET") nil)
+  (evil-define-key '(insert normal visual) evil-multiedit-mode-map (kbd "C-c d") 'evil-multiedit-toggle-or-restrict-region))
 
-;; (use-package evil-nerd-commenter
-;;   :bind
-;;   ("M-;" . evilnc-comment-or-uncomment-lines))
+(use-package evil-nerd-commenter
+  :bind
+  ("M-;" . evilnc-comment-or-uncomment-lines))
 
-;; (use-package evil-surround
-;;   :config
-;;   (global-evil-surround-mode 1))
+(use-package evil-surround
+  :config
+  (global-evil-surround-mode 1))
 
 (use-package helpful
   :bind
@@ -682,9 +683,22 @@
 (use-package dape
   :after eglot)
 
+;; Enable repeat mode for more ergonomic `dape' use
+;; (use-package repeat
+;;   :ensure nil
+;;   :config
+;;   (repeat-mode))
+
 ;; (use-package lsp-pyright
 ;;   :after lsp)
 
 (use-package flymake)
 
 (pixel-scroll-mode 1)
+
+(use-package csv-mode)
+
+(use-package pdf-tools)
+
+(use-package pdftotext
+  :ensure (:host github :repo "tecosaur/pdftotext.el"))
