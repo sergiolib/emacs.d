@@ -157,7 +157,7 @@
 
 (use-package consult
   :bind
-  ;;("C-s" . consult-line)
+  ("C-s" . consult-line)
   ("C-x b" . consult-buffer)
   ("C-x ," . consult-recent-file)
   ("M-y" . consult-yank-pop))
