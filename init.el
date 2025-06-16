@@ -258,6 +258,7 @@
 (use-package project
   :ensure nil
   :config
+  (add-to-list 'project-vc-extra-root-markers "pyproject.toml")
   (defun sergio/project-vterm ()
     (interactive)
     (let ((default-directory (project-root (project-current))))
@@ -300,7 +301,7 @@
   (add-hook 'tsx-ts-mode-hook 'eglot-ensure 100)
   (add-hook 'typescript-ts-mode-hook 'eglot-ensure 100)
   :config
-  (setq eglot-events-buffer-size 0)
+  (setq eglot-events-buffer-config '(:size 200000 :format full))
   (fset #'jsonrpc--log-event #'ignore)
   (setq gc-cons-threshold 800000
 	read-process-output-max (* 1024 1024))
@@ -391,14 +392,16 @@
   :config
   (move-text-default-bindings))
 
-(use-package git-gutter
-  :diminish git-gutter-mode
-  :config
-  (global-git-gutter-mode 1))
+;; (use-package git-gutter
+;;   :diminish git-gutter-mode
+;;   :config
+;;   (global-git-gutter-mode 1))
 
 (use-package yasnippet
   :hook
   (lsp-mode . yas-minor-mode))
+
+(use-package yasnippet-snippets)
 
 (use-package json-mode
   :mode
@@ -517,7 +520,8 @@
   :custom
   (evil-undo-system 'undo-redo)
   (evil-want-C-u-scroll t)
-  (evil-want-fine-undo t))
+  (evil-want-fine-undo t)
+  (evil-symbol-word-search t))
 
 (use-package evil-collection
   :after evil
@@ -577,7 +581,9 @@
 (use-package apheleia
   :config
   (apheleia-global-mode 1)
-  (setq apheleia-formatters-respect-indent-level nil))
+  (setq apheleia-formatters-respect-indent-level nil)
+  :hook
+  (python-base-mode . (lambda () (setq apheleia-formatter '(ruff ruff-isort)))))
 
 (use-package combobulate
   :commands (combobulate)
@@ -593,7 +599,9 @@
   (gptel-make-ollama "Ollama"
     :host "localhost:11434"
     :stream t
-    :models '(qwen2.5-coder:0.5b))
+    :models '(qwen3:14b))
+  :bind
+  ("C-c SPC" . gptel-send)
   )
 
 (use-package jtsx
@@ -702,3 +710,28 @@
 
 (use-package pdftotext
   :ensure (:host github :repo "tecosaur/pdftotext.el"))
+
+(use-package direnv
+  :config
+  (direnv-mode))
+
+(use-package copilot
+  :ensure (:host github :repo "copilot-emacs/copilot.el"
+		 :branch "main")
+  :hook
+  (python-base-mode . copilot-mode)
+  :config
+  (define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
+  (define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion))
+
+(use-package ox-pandoc
+  :after org
+  :config
+  (setq org-pandoc-options-for-gfm '((author . nil))))
+
+(use-package project-tab-groups
+  :ensure
+  :config
+  (project-tab-groups-mode 1))
+
+(global-visual-line-mode 1)
