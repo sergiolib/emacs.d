@@ -348,3 +348,7 @@
   :bind (:map copilot-completion-map
 	      ("<tab>" . 'copilot-accept-completion)
 	      ("TAB" . 'copilot-accept-completion)))
+
+(use-package multiple-cursors
+  :ensure t
+  :bind ("M-+" . mc/mark-next-like-this))
