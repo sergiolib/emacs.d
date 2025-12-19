@@ -75,6 +75,9 @@
   (define-key project-prefix-map (kbd "g") 'sergio/consult-ripgrep)
   (add-to-list 'project-switch-commands '(project-find-regexp "Find regexp" (kbd "g"))))
 
+;; Paredit
+(use-package paredit
+  :ensure t)
 
 ;; Configure and install which-key
 (use-package which-key
