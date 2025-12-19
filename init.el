@@ -72,7 +72,9 @@
   (defun sergio/consult-ripgrep ()
     (interactive)
     (consult-ripgrep (project-root (project-current))))
-  (define-key project-prefix-map (kbd "g") 'sergio/consult-ripgrep))
+  (define-key project-prefix-map (kbd "g") 'sergio/consult-ripgrep)
+  (add-to-list 'project-switch-commands '(project-find-regexp "Find regexp" (kbd "g"))))
+
 
 ;; Configure and install which-key
 (use-package which-key
