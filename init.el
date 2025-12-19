@@ -336,3 +336,15 @@
 (use-package org
   :after verb
   :config (define-key org-mode-map (kbd "C-c C-r") verb-command-map))
+
+(use-package track-changes
+  :ensure t)
+
+(use-package copilot
+  :ensure (:host github
+		 :repo "copilot-emacs/copilot.el")
+  :hook
+  (python-base-mode . copilot-mode)
+  :bind (:map copilot-completion-map
+	      ("<tab>" . 'copilot-accept-completion)
+	      ("TAB" . 'copilot-accept-completion)))
