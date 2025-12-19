@@ -307,7 +307,10 @@
 	read-file-name-completion-ignore-case t
 	read-buffer-completion-ignore-case t)
 
-  )
+  ;; Show column numbers
+  (column-number-mode 1)
+  ;; Yes -> y, No -> n
+  (defalias 'yes-or-no-p 'y-or-n-p))
 
 (use-package move-text
   :ensure t
