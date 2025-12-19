@@ -211,7 +211,10 @@
 ;; Configure python
 (use-package python
   :config
-  (add-hook 'python-base-mode-hook #'(lambda () (setq-local fill-column 120))))
+  (add-hook 'python-base-mode-hook #'(lambda () (setq-local fill-column 120)))
+  (add-hook 'python-base-mode 'which-function-mode)
+  :mode
+  ("\\.py\\'" . python-ts-mode))
 
 ;; Handy global keymaps for emacs
 (use-package emacs
