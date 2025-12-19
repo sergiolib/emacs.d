@@ -351,4 +351,9 @@
 
 (use-package multiple-cursors
   :ensure t
-  :bind ("M-+" . mc/mark-next-like-this))
+  :bind (("M-¿" . mc/mark-next-like-this)
+	 ("M-¡" . mc/mark-previous-like-this)))
+
+(use-package expand-region
+  :ensure t
+  :bind ("M-+" . er/expand-region))
