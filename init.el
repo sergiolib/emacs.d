@@ -8,7 +8,8 @@
 (use-package vertico
   :ensure t
   :config
-  (vertico-mode 1))
+  (vertico-mode 1)
+  (vertico-mouse-mode 1))
 
 ;; Install and configure orderless
 (use-package orderless
@@ -233,7 +234,8 @@
   (add-hook 'org-mode-hook #'(lambda () (electric-pair-local-mode -1)))
   (org-babel-do-load-languages 'org-babel-load-languages '((emacs-lisp . t)
 							   (shell . t)
-							   (verb . t)))
+							   (verb . t)
+							   (python . t)))
   :custom
   (org-confirm-babel-evaluate nil))
 
@@ -343,11 +345,8 @@
 (use-package copilot
   :ensure (:host github
 		 :repo "copilot-emacs/copilot.el")
-  :hook
-  (python-base-mode . copilot-mode)
-  :bind (:map copilot-completion-map
-	      ("<tab>" . 'copilot-accept-completion)
-	      ("TAB" . 'copilot-accept-completion)))
+  :bind (:map python-mode-map
+	      ("C-<tab>" . 'copilot-complete)))
 
 (use-package multiple-cursors
   :ensure t
@@ -357,3 +356,40 @@
 (use-package expand-region
   :ensure t
   :bind ("M-+" . er/expand-region))
+
+(use-package js
+  :config
+  (add-hook 'js-mode-hook #'(lambda () (setq-local tab-width 4))))
+
+;; Evil mode and extensions
+(use-package evil
+  :ensure t
+  :config
+  (evil-mode 1)
+  (global-set-key (kbd "C-M-u") 'universal-argument)
+  :custom
+  (evil-want-C-u-scroll t)
+  (evil-want-C-w-delete nil)
+  (evil-want-Y-yank-to-eol t)
+  (evil-want-fine-undo t)
+  (evil-undo-system 'undo-redo))
+
+(use-package evil-surround
+  :ensure t
+  :config
+  (evil-surround-mode t))
+
+(use-package evil-nerd-commenter
+  :ensure t
+  :config
+  (evilnc-default-hotkeys))
+
+(use-package evil-multiedit
+  :ensure t
+  :config
+  (evil-multiedit-default-keybinds))
+
+(use-package evil-collection
+  :ensure t
+  :config
+  (evil-collection-setup))
