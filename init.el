@@ -74,7 +74,11 @@
     (interactive)
     (consult-ripgrep (project-root (project-current))))
   (define-key project-prefix-map (kbd "g") 'sergio/consult-ripgrep)
-  (add-to-list 'project-switch-commands '(project-find-regexp "Find regexp" (kbd "g"))))
+  (defun sergio/project-magit-status ()
+    (interactive)
+    (magit-status (project-root (project-current))))
+  (add-to-list 'project-switch-commands '(project-find-regexp "Find regexp" "g"))
+  (add-to-list 'project-switch-commands '(sergio/project-magit-status "Magit" "m")))
 
 ;; Paredit
 (use-package paredit
@@ -212,8 +216,8 @@
 ;; Configure python
 (use-package python
   :config
-  (add-hook 'python-base-mode-hook #'(lambda () (setq-local fill-column 120)))
-  (add-hook 'python-base-mode 'which-function-mode)
+  (add-hook 'python-base-mode-hook (lambda () (setq-local fill-column 120)))
+  (add-hook 'python-base-mode-hook 'which-function-mode)
   :mode
   ("\\.py\\'" . python-ts-mode))
 
@@ -221,17 +225,17 @@
 (use-package emacs
   :init
   ;; C-c e opens init file
-  (global-set-key (kbd "C-c e") #'(lambda () (interactive) (find-file "~/.emacs.d/init.el"))))
+  (global-set-key (kbd "C-c e") (lambda () (interactive) (find-file "~/.emacs.d/init.el"))))
 
 ;; Org mode
 (use-package org
   :bind
-  ("C-c C-a" . org-agenda)
+  ("C-c a" . org-agenda)
   :config
   (let ((org-notes (f-glob "*.org" "~/Library/CloudStorage/GoogleDrive-sergiolib@gmail.com/My Drive/Notes/")))
     (setq org-agenda-files (append org-notes
 				   (list "~/Library/CloudStorage/GoogleDrive-sergiolib@gmail.com/My Drive/Agenda.org"))))
-  (add-hook 'org-mode-hook #'(lambda () (electric-pair-local-mode -1)))
+  (add-hook 'org-mode-hook (lambda () (electric-pair-local-mode -1)))
   (org-babel-do-load-languages 'org-babel-load-languages '((emacs-lisp . t)
 							   (shell . t)
 							   (verb . t)
@@ -267,29 +271,27 @@
   (setq inhibit-startup-message t)
   (setq initial-scratch-message nil)
   ;; Auto save and revert
-  (auto-save-visited-mode -1)
-  (auto-revert-mode 1)
+  (auto-save-visited-mode 1)
+  (global-auto-revert-mode 1)
   ;; Monday is week start
   (setq calendar-week-start-day 1)
   ;; Parens highlight expressions
   (setq show-paren-style 'expression)
+  (show-paren-mode 1)
   ;; Global line numbers
   (setq
    display-line-numbers-type 'relative
    display-line-numbers-widen t
    excluded-hooks-from-display-numbers '(doc-view-mode-hook))
-  (mapc (lambda (hook)
-	  (add-hook hook #'(lambda () (display-line-numbers-mode 0))))
-	excluded-hooks-from-display-numbers)
-  (let ((no-line-number-hooks '(vterm-mode-hook help-mode-hook)))
+  (let ((no-line-number-hooks '(doc-view-mode-hook vterm-mode-hook help-mode-hook)))
     (dolist (hook no-line-number-hooks)
-      (add-hook hook #'(lambda () (display-line-numbers-mode -1)))))
+      (add-hook hook (lambda () (display-line-numbers-mode -1)))))
   (global-display-line-numbers-mode 1)
   ;; Parens inserted in pairs
   (electric-pair-mode 1)
   ;; Tab widths
   (setq tab-width 4)
-  (add-hook 'typescript-ts-base-mode-hook #'(lambda () (setq tab-width 2)))
+  (add-hook 'typescript-ts-base-mode-hook (lambda () (setq tab-width 2)))
   ;; Turn off bell
   (setq ring-bell-function #'ignore)
   ;; Improved compilation mode
@@ -304,6 +306,7 @@
   (unbind-key (kbd "C-z"))
   ;; Custom file
   (setq custom-file "~/.emacs.d/custom.el")
+  (load custom-file 'noerror)
   ;; Ignore case during completion
   (setq completion-ignore-case t
 	read-file-name-completion-ignore-case t
@@ -312,7 +315,7 @@
   ;; Show column numbers
   (column-number-mode 1)
   ;; Yes -> y, No -> n
-  (defalias 'yes-or-no-p 'y-or-n-p))
+  (setq use-short-answers t))
 
 (use-package move-text
   :ensure t
@@ -321,15 +324,6 @@
 
 (use-package go-ts-mode
   :mode "\\.go$")
-
-(use-package gptel
-  :ensure t
-  :config
-  (setq
-   gptel-model 'gemini-2.5-pro
-   gptel-backend (gptel-make-gemini "Cenit"
-                   :key "AIzaSyDEdyzBU6-v1ypi6JEPeNs9s6Yrm7aUzg8"
-                   :stream t)))
 
 ;; Install and configure verb mode
 (use-package verb
@@ -345,7 +339,7 @@
 (use-package copilot
   :ensure (:host github
 		 :repo "copilot-emacs/copilot.el")
-  :bind (:map python-mode-map
+  :bind (:map python-base-mode-map
 	      ("C-<tab>" . 'copilot-complete)))
 
 (use-package multiple-cursors
@@ -357,13 +351,14 @@
   :ensure t
   :bind ("M-+" . er/expand-region))
 
-(use-package js
-  :config
-  (add-hook 'js-mode-hook #'(lambda () (setq-local tab-width 4))))
+(use-package js)
 
 ;; Evil mode and extensions
 (use-package evil
   :ensure t
+  :init
+  (setq evil-want-integration t)
+  (setq evil-want-keybinding nil)
   :config
   (evil-mode 1)
   (global-set-key (kbd "C-M-u") 'universal-argument)
@@ -372,24 +367,32 @@
   (evil-want-C-w-delete nil)
   (evil-want-Y-yank-to-eol t)
   (evil-want-fine-undo t)
-  (evil-undo-system 'undo-redo))
+  (evil-undo-system 'undo-redo)
+  (evil-symbol-word-search t))
 
 (use-package evil-surround
+  :after evil
   :ensure t
   :config
-  (evil-surround-mode t))
+  (global-evil-surround-mode t))
 
 (use-package evil-nerd-commenter
+  :after evil
   :ensure t
   :config
   (evilnc-default-hotkeys))
 
 (use-package evil-multiedit
+  :after evil
   :ensure t
   :config
   (evil-multiedit-default-keybinds))
 
 (use-package evil-collection
+  :after evil
   :ensure t
   :config
-  (evil-collection-setup))
+  (evil-collection-init))
+
+(use-package swift-ts-mode
+  :ensure t)
