@@ -95,7 +95,7 @@
   (menu-bar-mode 1)
   (scroll-bar-mode -1)
   (tool-bar-mode -1)
-  (set-face-attribute 'default nil :height 130 :family "JetBrains Mono"))
+  (set-face-attribute 'default nil :height 130 :family "Aporetic Serif Mono"))
 
 ;; Configure all the icons and nerd icons
 (use-package all-the-icons
