@@ -127,14 +127,20 @@
   )
 
 ;; Configure modus themes
-(use-package emacs
+;; (use-package emacs
+;;   :config
+;;   (setq modus-themes-common-palette-overrides
+;; 	'((border-mode-line-active bg-mode-line-active)
+;;           (border-mode-line-inactive bg-mode-line-inactive)
+;; 	  (bg-mode-line-active bg-cyan-subtle)
+;;           (fg-mode-line-active fg-main)))
+;;   (load-theme 'modus-operandi))
+
+;; Configure ef themes
+(use-package ef-themes
+  :ensure t
   :config
-  (setq modus-themes-common-palette-overrides
-	'((border-mode-line-active bg-mode-line-active)
-          (border-mode-line-inactive bg-mode-line-inactive)
-	  (bg-mode-line-active bg-cyan-subtle)
-          (fg-mode-line-active fg-main)))
-  (load-theme 'modus-operandi))
+  (load-theme 'ef-frost t))
 
 ;; Configure eglot
 (use-package eglot
