@@ -343,10 +343,15 @@
   :ensure t)
 
 (use-package copilot
-  :ensure (:host github
-		 :repo "copilot-emacs/copilot.el")
-  :bind (:map python-base-mode-map
-	      ("C-<tab>" . 'copilot-complete)))
+  :ensure t
+  :hook (prog-mode . copilot-mode)
+  :bind (:map copilot-completion-map
+              ("<tab>" . copilot-accept-completion)
+              ("TAB" . copilot-accept-completion)
+              ("C-<tab>" . copilot-accept-completion-by-word)
+              ("C-TAB" . copilot-accept-completion-by-word)
+              ("C-n" . copilot-next-completion)
+              ("C-p" . copilot-previous-completion)))
 
 (use-package multiple-cursors
   :ensure t
