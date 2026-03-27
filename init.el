@@ -1,6 +1,9 @@
 ;; Right option key on the Mac is a keyboard modifier
 (setq ns-right-option-modifier nil)
 
+;; Must be set before evil or evil-collection loads
+(setq evil-want-keybinding nil)
+
 ;; Load elpaca package manager
 (load "~/.emacs.d/elpaca.el")
 
@@ -418,3 +421,31 @@
 (use-package swift-ts-mode
   :ensure t)
 (put 'narrow-to-region 'disabled nil)
+
+(use-package claude-code
+  :ensure t
+  :config
+  (setq claude-code-terminal-backend 'vterm))
+
+(use-package general
+  :ensure t
+  :config
+  (general-evil-setup t)
+  (general-create-definer sergio/leader-keys
+    :keymaps '(normal insert visual emacs)
+    :prefix "SPC"
+    :global-prefix "C-SPC")
+  (sergio/leader-keys
+    "c" '(:which-key "claude" :keymap claude-code-command-map :package claude-code)
+    "t" '(:ignore t :which-key "toggles")
+    "tt" '(load-theme :which-key "choose theme")
+    "b" '(:ignore t :which-key "buffer")
+    "bb" '(consult-buffer :which-key "switch buffer")
+    "bd" '(kill-this-buffer :which-key "kill buffer")
+    "f" '(:ignore t :which-key "file")
+    "ff" '(find-file :which-key "find file")
+    "fr" '(recentf-open-files :which-key "recent files")
+    "p" '(:ignore t :which-key "project")
+    "pp" '(project-switch-project :which-key "switch project")
+    "pf" '(project-find-file :which-key "find file in project")
+    "ps" '(sergio/consult-ripgrep :which-key "search in project")))
