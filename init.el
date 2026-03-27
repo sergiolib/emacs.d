@@ -436,7 +436,7 @@
     :prefix "SPC"
     :global-prefix "C-SPC")
   (sergio/leader-keys
-    "c" '(:which-key "claude" :keymap claude-code-command-map :package claude-code)
+    "c" '(claude-code-transient :which-key "claude")
     "t" '(:ignore t :which-key "toggles")
     "tt" '(load-theme :which-key "choose theme")
     "b" '(:ignore t :which-key "buffer")
