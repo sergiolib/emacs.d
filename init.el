@@ -59,12 +59,17 @@
 
 ;; Configure and install magit
 (use-package transient
-  :ensure (:pin "0.10"))
+  :ensure t)
 
 (use-package magit
-  :ensure t
+  :after transient
+  :ensure
   :bind
   ("C-c g" . magit-status))
+
+(use-package forge
+  :after transient
+  :ensure t)
 
 ;; Configure project.el
 (use-package project
@@ -219,6 +224,11 @@
   :bind
   ("<f8>" . vterm))
 
+(use-package multi-vterm
+  :ensure t
+  :bind (:map project-prefix-map
+	      ("<f8>" . multi-vterm-project)))
+
 ;; Configure python
 (use-package python
   :config
@@ -368,8 +378,8 @@
 (use-package evil
   :ensure t
   :init
-  (setq evil-want-integration t)
-  (setq evil-want-keybinding nil)
+  (setq evil-want-integration t
+	evil-want-keybinding nil)
   :config
   (evil-mode 1)
   (global-set-key (kbd "C-M-u") 'universal-argument)
@@ -407,3 +417,4 @@
 
 (use-package swift-ts-mode
   :ensure t)
+(put 'narrow-to-region 'disabled nil)
