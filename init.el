@@ -103,7 +103,7 @@
   (menu-bar-mode 1)
   (scroll-bar-mode -1)
   (tool-bar-mode -1)
-  (set-face-attribute 'default nil :height 130 :family "Aporetic Serif Mono"))
+  (set-face-attribute 'default nil :height 130 :family "MesloLGS NF"))
 
 ;; Configure all the icons and nerd icons
 (use-package all-the-icons
@@ -223,14 +223,14 @@
 
 ;; Configure vterm
 (use-package vterm
-  :ensure t
-  :bind
-  ("<f8>" . vterm))
+  :ensure t)
 
 (use-package multi-vterm
+  :after vterm
   :ensure t
-  :bind (:map project-prefix-map
-	      ("<f8>" . multi-vterm-project)))
+  :config
+  (define-key project-prefix-map
+	      (kbd "<f8>")  'multi-vterm-project))
 
 ;; Configure python
 (use-package python
@@ -432,20 +432,20 @@
   :config
   (general-evil-setup t)
   (general-create-definer sergio/leader-keys
-    :keymaps '(normal insert visual emacs)
-    :prefix "SPC"
-    :global-prefix "C-SPC")
+			  :keymaps '(normal insert visual emacs)
+			  :prefix "SPC"
+			  :global-prefix "C-SPC")
   (sergio/leader-keys
-    "c" '(claude-code-transient :which-key "claude")
-    "t" '(:ignore t :which-key "toggles")
-    "tt" '(load-theme :which-key "choose theme")
-    "b" '(:ignore t :which-key "buffer")
-    "bb" '(consult-buffer :which-key "switch buffer")
-    "bd" '(kill-this-buffer :which-key "kill buffer")
-    "f" '(:ignore t :which-key "file")
-    "ff" '(find-file :which-key "find file")
-    "fr" '(recentf-open-files :which-key "recent files")
-    "p" '(:ignore t :which-key "project")
-    "pp" '(project-switch-project :which-key "switch project")
-    "pf" '(project-find-file :which-key "find file in project")
-    "ps" '(sergio/consult-ripgrep :which-key "search in project")))
+   "c" '(claude-code-transient :which-key "claude")
+   "t" '(:ignore t :which-key "toggles")
+   "tt" '(load-theme :which-key "choose theme")
+   "b" '(:ignore t :which-key "buffer")
+   "bb" '(consult-buffer :which-key "switch buffer")
+   "bd" '(kill-this-buffer :which-key "kill buffer")
+   "f" '(:ignore t :which-key "file")
+   "ff" '(find-file :which-key "find file")
+   "fr" '(recentf-open-files :which-key "recent files")
+   "p" '(:ignore t :which-key "project")
+   "pp" '(project-switch-project :which-key "switch project")
+   "pf" '(project-find-file :which-key "find file in project")
+   "ps" '(sergio/consult-ripgrep :which-key "search in project")))
