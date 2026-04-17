@@ -1,9 +1,6 @@
 ;; Right option key on the Mac is a keyboard modifier
 (setq ns-right-option-modifier nil)
 
-;; Must be set before evil or evil-collection loads
-(setq evil-want-keybinding nil)
-
 ;; Load elpaca package manager
 (load "~/.emacs.d/elpaca.el")
 
@@ -148,7 +145,7 @@
 (use-package ef-themes
   :ensure t
   :config
-  (load-theme 'ef-frost t))
+  (load-theme 'ef-owl t))
 
 ;; Configure eglot
 (use-package eglot
@@ -428,24 +425,25 @@
   (setq claude-code-terminal-backend 'vterm))
 
 (use-package general
+  :after evil
   :ensure t
   :config
   (general-evil-setup t)
   (general-create-definer sergio/leader-keys
-			  :keymaps '(normal insert visual emacs)
-			  :prefix "SPC"
-			  :global-prefix "C-SPC")
+    :keymaps '(normal insert visual emacs)
+    :prefix "SPC"
+    :global-prefix "C-SPC")
   (sergio/leader-keys
-   "c" '(claude-code-transient :which-key "claude")
-   "t" '(:ignore t :which-key "toggles")
-   "tt" '(load-theme :which-key "choose theme")
-   "b" '(:ignore t :which-key "buffer")
-   "bb" '(consult-buffer :which-key "switch buffer")
-   "bd" '(kill-this-buffer :which-key "kill buffer")
-   "f" '(:ignore t :which-key "file")
-   "ff" '(find-file :which-key "find file")
-   "fr" '(recentf-open-files :which-key "recent files")
-   "p" '(:ignore t :which-key "project")
-   "pp" '(project-switch-project :which-key "switch project")
-   "pf" '(project-find-file :which-key "find file in project")
-   "ps" '(sergio/consult-ripgrep :which-key "search in project")))
+    "c" '(claude-code-transient :which-key "claude")
+    "t" '(:ignore t :which-key "toggles")
+    "tt" '(load-theme :which-key "choose theme")
+    "b" '(:ignore t :which-key "buffer")
+    "bb" '(consult-buffer :which-key "switch buffer")
+    "bd" '(kill-this-buffer :which-key "kill buffer")
+    "f" '(:ignore t :which-key "file")
+    "ff" '(find-file :which-key "find file")
+    "fr" '(recentf-open-files :which-key "recent files")
+    "p" '(:ignore t :which-key "project")
+    "pp" '(project-switch-project :which-key "switch project")
+    "pf" '(project-find-file :which-key "find file in project")
+    "ps" '(sergio/consult-ripgrep :which-key "search in project")))
