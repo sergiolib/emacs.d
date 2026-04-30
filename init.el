@@ -226,8 +226,7 @@
   :after vterm
   :ensure t
   :config
-  (define-key project-prefix-map
-	      (kbd "<f8>")  'multi-vterm-project))
+  (define-key project-prefix-map "t" 'multi-vterm-project))
 
 ;; Configure python
 (use-package python
