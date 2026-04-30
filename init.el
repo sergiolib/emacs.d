@@ -447,3 +447,8 @@
     "pp" '(project-switch-project :which-key "switch project")
     "pf" '(project-find-file :which-key "find file in project")
     "ps" '(sergio/consult-ripgrep :which-key "search in project")))
+
+(use-package kubernetes
+  :ensure t
+  :config
+  (setq kubernetes-kubectl-executable "/usr/local/bin/kubectl"))
