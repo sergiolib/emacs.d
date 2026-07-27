@@ -1,3 +1,5 @@
+(server-start)
+
 ;; Right option key on the Mac is a keyboard modifier
 (setq ns-right-option-modifier nil)
 
@@ -67,9 +69,9 @@
   :bind
   ("C-c g" . magit-status))
 
-(use-package forge
-  :after transient
-  :ensure t)
+;; (use-package forge
+;;   :after transient
+;;   :ensure t)
 
 ;; Configure project.el
 (use-package project
@@ -197,21 +199,21 @@
   (python-base-mode . (lambda () (setq apheleia-formatter '(ruff ruff-isort)))))
 
 ;; Install and configure dape
-(use-package dape
-  :ensure t
-  :hook
-  ;; Save breakpoints on quit
-  (kill-emacs . dape-breakpoint-save)
-  ;; Load breakpoints on startup
-  (after-init . dape-breakpoint-load)
-  :custom
-  ;; Turn on global bindings for setting breakpoints with mouse
-  (dape-breakpoint-global-mode +1))
+;; (use-package dape
+;;   :ensure t
+;;   :hook
+;;   ;; Save breakpoints on quit
+;;   (kill-emacs . dape-breakpoint-save)
+;;   ;; Load breakpoints on startup
+;;   (after-init . dape-breakpoint-load)
+;;   :custom
+;;   ;; Turn on global bindings for setting breakpoints with mouse
+;;   (dape-breakpoint-global-mode +1))
 
 ;; For a more ergonomic Emacs and `dape' experience
-(use-package repeat
-  :custom
-  (repeat-mode +1))
+;; (use-package repeat
+;;   :custom
+;;   (repeat-mode +1))
 
 ;; Left and right side windows occupy full frame height (dape mode)
 (use-package emacs
@@ -342,6 +344,8 @@
 
 ;; Install and configure verb mode
 (use-package verb
+  :after org
+  :commands (verb-mode)
   :ensure t)
 
 (use-package org
@@ -351,16 +355,16 @@
 (use-package track-changes
   :ensure t)
 
-(use-package copilot
-  :ensure t
-  :hook (prog-mode . copilot-mode)
-  :bind (:map copilot-completion-map
-              ("<tab>" . copilot-accept-completion)
-              ("TAB" . copilot-accept-completion)
-              ("C-<tab>" . copilot-accept-completion-by-word)
-              ("C-TAB" . copilot-accept-completion-by-word)
-              ("C-n" . copilot-next-completion)
-              ("C-p" . copilot-previous-completion)))
+;; (use-package copilot
+;;   :ensure t
+;;   :hook (prog-mode . copilot-mode)
+;;   :bind (:map copilot-completion-map
+;;               ("<tab>" . copilot-accept-completion)
+;;               ("TAB" . copilot-accept-completion)
+;;               ("C-<tab>" . copilot-accept-completion-by-word)
+;;               ("C-TAB" . copilot-accept-completion-by-word)
+;;               ("C-n" . copilot-next-completion)
+;;               ("C-p" . copilot-previous-completion)))
 
 (use-package multiple-cursors
   :ensure t
@@ -371,7 +375,11 @@
   :ensure t
   :bind ("M-+" . er/expand-region))
 
-(use-package js)
+(use-package js
+  :mode (("//.js$" . js-mode)
+	 ("//.jsx$" . js-jsx-mode)
+	 ("//.ts$" . js-ts-mode)
+	 ("//.tsx$" . js-jsx-mode)))
 
 ;; Evil mode and extensions
 (use-package evil
@@ -418,10 +426,10 @@
   :ensure t)
 (put 'narrow-to-region 'disabled nil)
 
-(use-package claude-code
-  :ensure t
-  :config
-  (setq claude-code-terminal-backend 'vterm))
+;; (use-package claude-code
+;;   :ensure t
+;;   :config
+;;   (setq claude-code-terminal-backend 'vterm))
 
 (use-package general
   :after evil
@@ -447,7 +455,19 @@
     "pf" '(project-find-file :which-key "find file in project")
     "ps" '(sergio/consult-ripgrep :which-key "search in project")))
 
-(use-package kubernetes
+;; (use-package kubernetes
+;;   :ensure t
+;;   :config
+;;   (setq kubernetes-kubectl-executable "/usr/local/bin/kubectl"))
+
+(use-package exec-path-from-shell
   :ensure t
   :config
-  (setq kubernetes-kubectl-executable "/usr/local/bin/kubectl"))
+  (when (memq window-system '(mac ns x))
+    (exec-path-from-shell-initialize))
+  (when (daemonp)
+    (exec-path-from-shell-initialize)))
+
+
+(use-package yaml-ts-mode
+  :mode "\\.ya?ml$")
